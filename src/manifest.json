@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Pagestash",
+    "version": "1.0.0",
+    "description": "Manage your web pages with ease",
+    "side_panel": {
+        "default_path": "src/sidepanel/index.html"
+    },
+    "background": {
+        "service_worker": "src/background/index.ts",
+        "type": "module"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "permissions": [
+        "sidePanel"
+    ]
+}
