@@ -1,8 +1,13 @@
 {
     "manifest_version": 3,
-    "name": "Pagestash",
+    "name": "PageStash",
     "version": "1.0.0",
     "description": "Manage your web pages with ease",
+    "icons": {
+        "16": "src/assets/images/logo-icon-16.png",
+        "48": "src/assets/images/logo-icon-48.png",
+        "128": "src/assets/images/logo-icon-128.png"
+    },
     "side_panel": {
         "default_path": "src/sidepanel/index.html"
     },
