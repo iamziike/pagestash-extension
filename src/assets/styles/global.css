@@ -95,4 +95,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* custom */
+  .ellipsis-text {
+    @apply text-ellipsis text-nowrap overflow-hidden
+  }
 }

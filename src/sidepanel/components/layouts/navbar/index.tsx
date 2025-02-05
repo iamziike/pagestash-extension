@@ -4,7 +4,7 @@ import CustomSidebar from "./custom-sidebar";
 
 const Navbar = () => {
   return (
-    <nav className="flex gap-3 justify-between items-center py-2">
+    <nav className="sticky top-0 left-0 w-full bg-background flex gap-3 justify-between items-center pt-4 py-2">
       <CustomSidebar />
       <div className="w-40 sm:w-52">
         <Logo />

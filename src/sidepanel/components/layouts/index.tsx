@@ -11,7 +11,7 @@ const DefaultLayout = ({ children }: Props) => {
   return (
     <ThemeProvider storageKey={STORE_KEY.SIDEBAR_THEME}>
       <SidebarProvider className="block" defaultOpen={false}>
-        <div className="flex flex-col p-4 px-6 text-base font-default">
+        <div className="flex flex-col px-6 text-base font-default max-w-lg mx-auto">
           <Navbar />
           {children}
         </div>
