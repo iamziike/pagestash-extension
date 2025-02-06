@@ -10,3 +10,11 @@ export const getSystemColorScheme = () => {
     ? "dark"
     : "light";
 };
+
+export const navigateWindowTo = (url: string) => {
+  window.open(url, "_blank");
+};
+
+export const waitFor = (secs: number) =>
+  new Promise((resolve) => setTimeout(resolve, secs * 1000));
+

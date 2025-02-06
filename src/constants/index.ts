@@ -2,6 +2,9 @@ import { Bookmark, Home, Key, Settings } from "lucide-react";
 
 export const APP_NAME = "PageStash";
 
+export const OPENAI_CREATE_KEY_DOCS_URL =
+  "https://platform.openai.com/api-keys";
+
 export const STORE_KEY = {
   SIDEBAR_THEME: "SIDEBAR_THEME_STORAGE_KEY",
 } as const;

@@ -1,13 +1,12 @@
+import useSettings from "@/sidepanel/store/useSettings";
+import { InputHTMLAttributes } from "react";
 import { cn } from "@/utils";
 import { Input } from "./input";
-import { useAtom } from "jotai";
-import { settingsAtom } from "@/sidepanel/store/settings";
-import { InputHTMLAttributes } from "react";
 
 const CustomInput: React.FC<InputHTMLAttributes<HTMLInputElement>> = ({
   ...props
 }) => {
-  const [settings] = useAtom(settingsAtom);
+  const { highlightInput } = useSettings();
 
   return (
     <Input
@@ -16,7 +15,7 @@ const CustomInput: React.FC<InputHTMLAttributes<HTMLInputElement>> = ({
         props.className,
         "text-base px-5 bg-accent placeholder:text-sm",
         {
-          "focus-visible:ring-0": !settings.highlightInput,
+          "focus-visible:ring-0": !highlightInput,
         }
       )}
     />

@@ -42,7 +42,7 @@ const CustomSidebar = () => {
               strokeWidth={2}
             />
           </SidebarHeader>
-          <SidebarContent className="mt-5 px-4">
+          <SidebarContent className="pt-5 px-4">
             <SidebarGroup className="p-0">
               <BookmarkSearch className="selection:bg-sidebar-primary selection:text-sidebar-primary-foreground" />
             </SidebarGroup>

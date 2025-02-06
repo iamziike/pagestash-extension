@@ -7,10 +7,6 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 
 const Home = () => {
-  useEffect(() => {
-    chrome.bookmarks.getTree((bookmark) => console.log(bookmark));
-  }, []);
-
   return (
     <section className="py-6">
       <header>

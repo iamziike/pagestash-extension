@@ -19,6 +19,7 @@
         "<all_urls>"
     ],
     "permissions": [
-        "sidePanel"
+        "sidePanel",
+        "storage"
     ]
 }
