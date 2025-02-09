@@ -64,8 +64,45 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          "60%": {
+            height: "var(--radix-accordion-content-height)",
+            transform: "scaleY(1.05)",
+          },
+          "80%": {
+            height: "var(--radix-accordion-content-height)",
+            transform: "scaleY(0.98)",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+            transform: "scaleY(1)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+            transform: "scaleY(1)",
+          },
+          "20%": {
+            height: "var(--radix-accordion-content-height)",
+            transform: "scaleY(1.02)",
+          },
+          "40%": {
+            height: "var(--radix-accordion-content-height)",
+            transform: "scaleY(0.95)",
+          },
+          to: { height: "0", transform: "scaleY(0.8)" },
+        },
+      },
+      animation: {
+        bouncy: "0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "accordion-down":
+          "accordion-down 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "accordion-up": "accordion-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
 };
-

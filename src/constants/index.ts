@@ -31,3 +31,13 @@ export const PAGES = {
     icon: Key,
   },
 } as const;
+
+export const BOOKMARK_FILTERS = [
+  { type: "date-range", label: "Visited From", name: "visitDate" },
+  { type: "date-range", label: "Created From", name: "createdDate" },
+] as const;
+
+export const DRAGGABLE_ITEMS = {
+  FOLDER: "FOLDER",
+  LINK: "LINK",
+} as const;

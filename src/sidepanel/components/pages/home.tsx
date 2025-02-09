@@ -1,8 +1,7 @@
 import BookmarkSearch from "../ui/bookmarks-search";
 import CustomTabs from "../ui/custom-tabs";
 import Favourites from "../ui/favourites";
-import { useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 
@@ -10,7 +9,7 @@ const Home = () => {
   return (
     <section className="py-6">
       <header>
-        <BookmarkSearch />
+        <BookmarkSearch autoFocus />
       </header>
       <main className="space-y-7">
         <section className="my-3">
@@ -51,10 +50,10 @@ const Home = () => {
               </div>
             ))}
           </div>
-          <Button variant="secondary" className="mt-4 w-full py-5">
-            Show All{" "}
+          <Button className="mt-4 w-full py-5 bg-primary">
+            Show All
             <span>
-              <ChevronDown />
+              <ChevronRight />
             </span>
           </Button>
         </section>
@@ -78,10 +77,10 @@ const Home = () => {
               </div>
             ))}
           </div>
-          <Button variant="secondary" className="mt-4 w-full py-5">
-            Show All{" "}
+          <Button className="mt-4 w-full py-5 bg-primary">
+            Show All
             <span>
-              <ChevronDown />
+              <ChevronRight />
             </span>
           </Button>
         </section>

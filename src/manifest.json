@@ -20,6 +20,8 @@
     ],
     "permissions": [
         "sidePanel",
-        "storage"
+        "bookmarks",
+        "storage",
+        "favicon"
     ]
 }
