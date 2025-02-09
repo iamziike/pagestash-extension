@@ -1,7 +1,7 @@
 import useBookmark from "@/sidepanel/store/useBookmark";
 import BookmarkSearch from "../ui/bookmarks-search";
 import Filters from "../ui/filters";
-import CollapsibleBookmark from "../ui/collapsible-bookmark";
+import CollapsibleBookmark from "../ui/pages/bookmarks/collapsible-bookmark";
 import { BOOKMARK_FILTERS } from "@/constants";
 
 export default function Bookmarks() {

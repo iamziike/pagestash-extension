@@ -1,4 +1,4 @@
-import BookmarkLink from "./pages/bookmarks/BookmarkLink";
+import BookmarkLink from "./BookmarkLink";
 import useBookmark from "@/sidepanel/store/useBookmark";
 import { cn } from "@/utils";
 import { Bookmark, DraggedItem } from "@/models";
