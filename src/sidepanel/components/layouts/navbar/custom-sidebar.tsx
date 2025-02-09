@@ -5,7 +5,7 @@ import { Separator } from "../../ui/separator";
 import { PAGES } from "@/constants";
 import { PanelLeft } from "lucide-react";
 import { cn } from "@/utils";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +20,7 @@ const LINKS = [PAGES.HOME, PAGES.BOOKMARKS, PAGES.SETTINGS, PAGES.CREDENTIALS];
 
 const CustomSidebar = () => {
   const { toggleSidebar } = useSidebar();
+  const location = useLocation();
 
   return (
     <>
@@ -53,7 +54,11 @@ const CustomSidebar = () => {
                     to={path}
                     onClick={toggleSidebar}
                     className={cn(
-                      "flex items-center gap-4 text-xl p-3 hover:bg-sidebar-primary hover:text-sidebar-primary-foreground rounded-md cursor-pointer"
+                      "flex items-center gap-4 text-xl p-3 hover:bg-sidebar-primary hover:text-sidebar-primary-foreground rounded-md cursor-pointer",
+                      {
+                        "bg-sidebar-primary text-sidebar-primary-foreground":
+                          path === location.pathname,
+                      }
                     )}
                   >
                     <span>{<Icon />}</span>
