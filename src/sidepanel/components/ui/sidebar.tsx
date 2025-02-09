@@ -2,7 +2,6 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { VariantProps, cva } from "class-variance-authority";
 import { PanelLeft } from "lucide-react";
-import { useIsMobile } from "@/sidepanel/hooks/use-mobile";
 import { cn } from "@/utils/index";
 import { Button } from "@/sidepanel/components/ui/button";
 import { Input } from "@/sidepanel/components/ui/input";
@@ -19,7 +18,6 @@ import {
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
@@ -27,9 +25,6 @@ type SidebarContext = {
   state: "expanded" | "collapsed";
   open: boolean;
   setOpen: (open: boolean) => void;
-  openMobile: boolean;
-  setOpenMobile: (open: boolean) => void;
-  isMobile: boolean;
   toggleSidebar: () => void;
 };
 
@@ -42,7 +37,7 @@ function useSidebar() {
   }
 
   // custom isVisble is added
-  return { ...context, isVisble: context.open || context.openMobile };
+  return { ...context, isVisble: context.open };
 }
 
 const SidebarProvider = React.forwardRef<
@@ -65,9 +60,6 @@ const SidebarProvider = React.forwardRef<
     },
     ref
   ) => {
-    const isMobile = useIsMobile();
-    const [openMobile, setOpenMobile] = React.useState(false);
-
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen);
@@ -89,10 +81,8 @@ const SidebarProvider = React.forwardRef<
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
-      return isMobile
-        ? setOpenMobile((open) => !open)
-        : setOpen((open) => !open);
-    }, [isMobile, setOpen, setOpenMobile]);
+      setOpen((open) => !open);
+    }, [setOpen]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -119,12 +109,9 @@ const SidebarProvider = React.forwardRef<
         state,
         open,
         setOpen,
-        isMobile,
-        openMobile,
-        setOpenMobile,
         toggleSidebar,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [state, open, setOpen, toggleSidebar]
     );
 
     return (
@@ -166,11 +153,10 @@ const Sidebar = React.forwardRef<
     { side = "left", collapsible = "offcanvas", className, children, ...props },
     ref
   ) => {
-    const { open, setOpenMobile, openMobile, setOpen } = useSidebar();
+    const { open, setOpen } = useSidebar();
 
     const handleToggle = (value: boolean) => {
       setOpen(value);
-      setOpenMobile(value);
     };
 
     if (collapsible === "none") {
@@ -189,16 +175,11 @@ const Sidebar = React.forwardRef<
     }
 
     return (
-      <Sheet open={open || openMobile} onOpenChange={handleToggle} {...props}>
+      <Sheet open={open} onOpenChange={handleToggle} {...props}>
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
           className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden focus-visible:outline-none"
-          style={
-            {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
           side={side}
         >
           <div className="flex h-full w-full flex-col">{children}</div>
@@ -510,7 +491,7 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
-    const { isMobile, state } = useSidebar();
+    const { state } = useSidebar();
 
     const button = (
       <Comp
@@ -539,7 +520,7 @@ const SidebarMenuButton = React.forwardRef<
         <TooltipContent
           side="right"
           align="center"
-          hidden={state !== "collapsed" || isMobile}
+          hidden={state !== "collapsed"}
           {...tooltip}
         />
       </Tooltip>
