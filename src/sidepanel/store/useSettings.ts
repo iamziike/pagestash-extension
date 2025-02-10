@@ -5,6 +5,7 @@ interface SettingsState {
   credential: string;
   highlightInput: boolean;
   theme: "dark" | "light" | "system";
+  quickSearch: boolean;
 }
 
 interface SettingsStateActions {
@@ -19,6 +20,7 @@ const useSettings = create<SettingsState & SettingsStateActions>()(
       credential: "",
       highlightInput: false,
       theme: "dark",
+      quickSearch: true,
       updateState(data) {
         setter((prevState) => ({ ...prevState, ...data }));
       },
@@ -43,6 +45,7 @@ const useSettings = create<SettingsState & SettingsStateActions>()(
             credential: state.credential,
             highlightInput: state.highlightInput,
             theme: state.theme,
+            quickSearch: state.quickSearch,
           };
 
           chrome.storage.sync.set({

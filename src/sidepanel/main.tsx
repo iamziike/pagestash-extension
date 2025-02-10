@@ -4,6 +4,7 @@ import Home from "./components/pages/home.tsx";
 import Credentials from "./components/pages/credentials.tsx";
 import Bookmarks from "./components/pages/bookmarks.tsx";
 import Settings from "./components/pages/settings.tsx";
+import RecentlyVisitedLinks from "./components/pages/recently-visited.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
@@ -44,6 +45,15 @@ export const router = createMemoryRouter(
       element: (
         <DefaultLayout>
           <Credentials />
+        </DefaultLayout>
+      ),
+    },
+    {
+      path: PAGES.RECENTLY_VISITED.path,
+      errorElement: <div>Something went wrong</div>,
+      element: (
+        <DefaultLayout>
+          <RecentlyVisitedLinks />
         </DefaultLayout>
       ),
     },

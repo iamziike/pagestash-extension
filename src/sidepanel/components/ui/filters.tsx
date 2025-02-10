@@ -1,8 +1,8 @@
 import DatePickerWithRange from "./date-picker";
-import { cn } from "@/utils";
+import { cn, toDate } from "@/utils";
 import { Label } from "./label";
-import { useSearchParams } from "react-router-dom";
 import { SlidersHorizontal } from "lucide-react";
+import { FilterOption } from "@/models";
 import {
   Accordion,
   AccordionContent,
@@ -11,20 +11,20 @@ import {
 } from "./accordion";
 
 interface Props {
+  searchParams: URLSearchParams;
+  onChange: (value: URLSearchParams) => void;
   className?: string;
   title: string;
-  filters: Readonly<
-    {
-      type: "input" | "date-range";
-      label: string;
-      name: string;
-    }[]
-  >;
+  filters: Readonly<FilterOption[]>;
 }
 
-const Filters = ({ filters, title, className }: Props) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
+const Filters = ({
+  filters,
+  title,
+  className,
+  onChange,
+  searchParams,
+}: Props) => {
   return (
     <div className={cn(className)}>
       <Accordion type="single" collapsible className="mt-0">
@@ -40,35 +40,35 @@ const Filters = ({ filters, title, className }: Props) => {
               {filters.map((filter) => {
                 if (filter.type === "date-range") {
                   const filterName = filter.name;
-                  const dates = searchParams.getAll(filterName);
-                  const from = dates[0] && new Date(dates[0]);
-                  const to = dates[1] && new Date(dates[1]);
+                  const secondaryFilterName = filter.secondaryName!;
+                  const from = toDate(searchParams.get(filterName));
+                  const to = toDate(searchParams.get(secondaryFilterName));
 
                   return (
                     <Label key={filter.name} className="space-y-2 flex-1">
                       <div>{filter?.label}</div>
                       <DatePickerWithRange
-                        // className="border border-r"
                         restrictDaysAfterToday
                         value={{ from, to }}
                         onChange={(value) => {
                           searchParams.delete(filterName);
-
+                          searchParams.delete(secondaryFilterName);
                           if (value?.from) {
                             searchParams.append(
                               filterName,
                               value?.from?.toISOString()
                             );
                           }
-
                           if (value?.to) {
                             searchParams.append(
-                              filterName,
+                              secondaryFilterName,
                               value?.to?.toISOString()
                             );
                           }
 
-                          setSearchParams(searchParams);
+                          console.log(secondaryFilterName);
+
+                          onChange(searchParams);
                         }}
                       />
                     </Label>

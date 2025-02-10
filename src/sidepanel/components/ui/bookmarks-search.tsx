@@ -1,17 +1,9 @@
-import CustomInput from "./custom-input";
-import { cn } from "@/utils";
+import CustomInput, { CustomInputProps } from "./custom-input";
 
-const BookmarkSearch = ({
-  className,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) => {
+const BookmarkSearch = ({ ...props }: CustomInputProps) => {
   return (
-    <div>
-      <CustomInput
-        {...props}
-        className={cn(className, "rounded-lg")}
-        placeholder="Search for Bookmarks..."
-      />
+    <div className="flex items-center justify-between ">
+      <CustomInput {...props} placeholder="Search for Bookmarks..." />
     </div>
   );
 };

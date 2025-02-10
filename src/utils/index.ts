@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { isValid } from "date-fns";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
@@ -28,5 +29,20 @@ export const copyToClipboard = (text?: string) => {
       toast("Failed to copy URL to clipboard");
     }
   );
+};
+
+export const getEndOfDay = (date: Date) => {
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  return endOfDay;
+};
+
+export const getAllSearchParams = <T>(searchParams: URLSearchParams) => {
+  return Object.fromEntries(searchParams.entries()) as T;
+};
+
+export const toDate = (value?: string | Date | null) => {
+  const date = new Date(value || "");
+  return isValid(date) ? date : undefined;
 };
 

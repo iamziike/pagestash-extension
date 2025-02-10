@@ -30,6 +30,11 @@ export const PAGES = {
     label: "Credentials",
     icon: Key,
   },
+  RECENTLY_VISITED: {
+    path: "/recently-visited",
+    label: "Recently Visited",
+    icon: Key,
+  },
 } as const;
 
 export const BOOKMARK_FILTERS = [

@@ -2,9 +2,11 @@ import useBookmark from "@/sidepanel/store/useBookmark";
 import BookmarkSearch from "../ui/bookmarks-search";
 import Filters from "../ui/filters";
 import CollapsibleBookmark from "../ui/pages/bookmarks/collapsible-bookmark";
+import useTypedSearchParams from "@/sidepanel/hooks/useTypedSearchParams";
 import { BOOKMARK_FILTERS } from "@/constants";
 
 export default function Bookmarks() {
+  const { searchParams } = useTypedSearchParams();
   const { bookmark } = useBookmark();
 
   return (
@@ -15,6 +17,8 @@ export default function Bookmarks() {
           className="mt-3"
           title="My Bookmarks"
           filters={BOOKMARK_FILTERS}
+          searchParams={searchParams}
+          onChange={() => {}}
         />
       </header>
       <main>
