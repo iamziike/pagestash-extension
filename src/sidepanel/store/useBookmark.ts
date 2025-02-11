@@ -40,6 +40,37 @@ export const bookmarkHelpers = {
     url.searchParams.set("size", "64");
     return url.toString();
   },
+  getAllBookmarkLinks(
+    bookmark: Bookmark | null,
+    config = {
+      maxLimit: Infinity,
+    }
+  ): Bookmark[] {
+    const links: Bookmark[] = [];
+    const { maxLimit } = config;
+
+    const traverseBookmarks = (node: Bookmark) => {
+      if (links.length >= maxLimit) {
+        return true;
+      }
+
+      if (node.url) {
+        links.push(node);
+      }
+
+      if (node.children) {
+        // prevent unneceesary looping
+        // stops when maxLimit hit
+        node.children.some(traverseBookmarks);
+      }
+    };
+
+    if (bookmark) {
+      traverseBookmarks(bookmark);
+    }
+
+    return links;
+  },
 };
 
 export default useBookmark;
