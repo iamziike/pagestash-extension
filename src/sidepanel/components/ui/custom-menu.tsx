@@ -25,7 +25,7 @@ const CustomMenu = ({ content, trigger }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
+      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
         {content.map(({ items, title }, index) => (
           <Fragment key={index}>
             {title && (

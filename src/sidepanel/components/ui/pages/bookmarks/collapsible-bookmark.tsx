@@ -73,7 +73,6 @@ const CollapsibleBookmark = ({ data }: Props) => {
       </div>
 
       <div
-        onAnimationEnd={toggleFolderOpenState}
         className={cn(
           "ms-[26px] max-h-0 transition-all duration-100 ease-in-out",
           {
