@@ -66,8 +66,6 @@ const Filters = ({
                             );
                           }
 
-                          console.log(secondaryFilterName);
-
                           onChange(searchParams);
                         }}
                       />
