@@ -10,7 +10,7 @@ export default function Bookmarks() {
   const { bookmark } = useBookmark();
 
   return (
-    <section className="py-6 flex flex-col">
+    <section className="py-6 flex flex-col flex-1 h-full">
       <header>
         <BookmarkSearch autoFocus />
         <Filters
@@ -21,7 +21,7 @@ export default function Bookmarks() {
           onChange={() => {}}
         />
       </header>
-      <main>
+      <main className="h-full flex-1 hidden-scrollbar">
         {bookmark?.children?.map((data) => (
           <CollapsibleBookmark key={data?.id} data={data} />
         ))}

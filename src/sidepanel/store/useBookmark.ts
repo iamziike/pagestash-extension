@@ -7,7 +7,7 @@ interface BookmarksState {
 
 interface BookmarksStateActions {
   addNewBookmark(bookmark: BookmarkCreateArg): void;
-  removeBookmark(id: string): void;
+  removeBookmark(id: string, type: "link" | "folder"): void;
   moveBookmark(id: string, destination: BookmarkCreateArg): void;
 }
 
@@ -24,7 +24,15 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
     return {
       bookmark: null,
       addNewBookmark() {},
-      removeBookmark() {},
+      async removeBookmark(id: string, type = "link") {
+        if (type === "link") {
+          await chrome.bookmarks.remove(id);
+        } else {
+          await chrome.bookmarks.removeTree(id);
+        }
+
+        updateBookmarkList();
+      },
       async moveBookmark(id, destination) {
         await chrome.bookmarks.move(id, destination);
         updateBookmarkList();

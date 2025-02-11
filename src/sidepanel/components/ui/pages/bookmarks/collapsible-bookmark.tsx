@@ -1,10 +1,11 @@
 import BookmarkLink from "./BookmarkLink";
 import useBookmark from "@/sidepanel/store/useBookmark";
+import CustomMenu from "../../custom-menu";
 import { cn } from "@/utils";
 import { Bookmark, DraggedItem } from "@/models";
 import { useDrag, useDrop } from "react-dnd";
 import { DRAGGABLE_ITEMS } from "@/constants";
-import { BanIcon, Folder, FolderOpen } from "lucide-react";
+import { BanIcon, EllipsisVertical, Folder, FolderOpen } from "lucide-react";
 import { titleCase } from "title-case";
 import { useState } from "react";
 
@@ -13,7 +14,7 @@ interface Props {
 }
 
 const CollapsibleBookmark = ({ data }: Props) => {
-  const { moveBookmark } = useBookmark();
+  const { moveBookmark, removeBookmark } = useBookmark();
   const [isFolderContentVisible, setIsFolderContentVisible] = useState(false);
 
   const [, drop] = useDrop(
@@ -56,20 +57,41 @@ const CollapsibleBookmark = ({ data }: Props) => {
 
   return (
     <div ref={drop} className="overflow-hidden text-sm">
-      <div
-        ref={drag}
-        onClick={toggleFolderOpenState}
-        className={cn("flex items-center gap-2 cursor-pointer mb-2", {
-          "opacity-70": isDragging,
-        })}
-      >
-        {isFolderContentVisible ? (
-          <FolderOpen size={18} />
-        ) : (
-          <Folder size={18} />
-        )}
+      <div className="flex justify-between items-center group">
+        <div
+          ref={drag}
+          onClick={toggleFolderOpenState}
+          className={cn("flex items-center gap-2 cursor-pointer mb-2", {
+            "opacity-70": isDragging,
+          })}
+        >
+          {isFolderContentVisible ? (
+            <FolderOpen size={18} />
+          ) : (
+            <Folder size={18} />
+          )}
 
-        {titleCase(data.title || "Unamed Folder")}
+          {titleCase(data.title || "Unamed Folder")}
+        </div>
+
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CustomMenu
+            trigger={<EllipsisVertical size={16} />}
+            content={[
+              {
+                items: [
+                  {
+                    label: "Remove",
+                    className: "text-destructive font-semibold",
+                    async onClick() {
+                      removeBookmark(data.id, "folder");
+                    },
+                  },
+                ],
+              },
+            ]}
+          />
+        </div>
       </div>
 
       <div
@@ -81,7 +103,7 @@ const CollapsibleBookmark = ({ data }: Props) => {
         )}
       >
         {data?.children?.map((bookmark) => {
-          if (bookmark.url?.length) {
+          if (bookmark.url) {
             return (
               <BookmarkLink
                 key={bookmark.id}
