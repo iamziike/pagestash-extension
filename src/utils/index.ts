@@ -46,3 +46,13 @@ export const toDate = (value?: string | Date | null) => {
   return isValid(date) ? date : undefined;
 };
 
+export const getCurrentTab = async () => {
+  const tab = (
+    await chrome.tabs.query({ active: true, currentWindow: true })
+  )?.[0];
+
+  return {
+    title: tab?.title,
+    url: tab?.url,
+  };
+};

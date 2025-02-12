@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Bookmark, BookmarkCreateArg } from "@/models";
+import { Bookmark, BookmarkChangesArg, BookmarkCreateArg } from "@/models";
 
 interface BookmarksState {
   bookmark: Bookmark | null;
@@ -9,6 +9,7 @@ interface BookmarksStateActions {
   addNewBookmark(bookmark: BookmarkCreateArg): void;
   removeBookmark(id: string, type: "link" | "folder"): void;
   moveBookmark(id: string, destination: BookmarkCreateArg): void;
+  updateBookmark(id: string, destination: BookmarkChangesArg): void;
 }
 
 const useBookmark = create<BookmarksState & BookmarksStateActions>()(
@@ -35,6 +36,10 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
       },
       async moveBookmark(id, destination) {
         await chrome.bookmarks.move(id, destination);
+        updateBookmarkList();
+      },
+      async updateBookmark(id, destination) {
+        await chrome.bookmarks.update(id, destination);
         updateBookmarkList();
       },
     };

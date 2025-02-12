@@ -38,9 +38,8 @@ const Credentials = () => {
 
     return (
       <CustomModal
-        size="xs"
         isOpen={isFormVisible}
-        onClose={handleFormClose}
+        onOpenChange={setIsFormVisible}
         trigger={
           <Button onClick={handleFormOpen}>
             {settings.credential ? "Update your API Key" : "Add your API Key"}

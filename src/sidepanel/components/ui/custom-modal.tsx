@@ -2,37 +2,27 @@ import { cn } from "@/utils";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 
 interface Props {
-  trigger: React.ReactElement;
+  trigger?: React.ReactElement;
   children: React.ReactElement | React.ReactElement[];
+  size?: "medium" | "large";
   isOpen?: boolean;
-  onClose?: VoidFunction;
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  onOpenChange?: (open: boolean) => void;
 }
 
 const CustomModal = ({
   trigger,
-  isOpen,
   children,
-  size = "md",
-  onClose,
+  size,
+  onOpenChange,
+  isOpen,
 }: Props) => {
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(state) => {
-        if (!state) {
-          onClose?.();
-        }
-      }}
-    >
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent
-        className={cn({
-          "max-w-xs": size === "xs",
-          "max-w-sm": size === "sm",
-          "max-w-md": size === "md",
-          "max-w-lg": size === "lg",
-          "max-w-xl": size === "xl",
+        className={cn("w-11/12 rounded-sm", {
+          "max-w-full md:max-w-screen-lg": size === "large",
+          "max-w-full md:max-w-screen-md": size === "medium",
         })}
       >
         <div className="mt-4">{children}</div>

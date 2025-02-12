@@ -1,6 +1,10 @@
 import BookmarkLink from "./BookmarkLink";
 import useBookmark from "@/sidepanel/store/useBookmark";
 import CustomMenu from "../../custom-menu";
+import CustomModal from "../../custom-modal";
+import CustomTabs from "../../custom-tabs";
+import BookmarkFolderForm from "./bookmark-folder-form";
+import BookmarkLinkForm from "./bookmark-link-form";
 import { cn } from "@/utils";
 import { Bookmark, DraggedItem } from "@/models";
 import { useDrag, useDrop } from "react-dnd";
@@ -8,6 +12,7 @@ import { DRAGGABLE_ITEMS } from "@/constants";
 import { BanIcon, EllipsisVertical, Folder, FolderOpen } from "lucide-react";
 import { titleCase } from "title-case";
 import { useState } from "react";
+import { BookmarkFormState } from "@/utils/bookmarks/models";
 
 interface Props {
   data: Bookmark;
@@ -15,6 +20,7 @@ interface Props {
 
 const CollapsibleBookmark = ({ data }: Props) => {
   const { moveBookmark, removeBookmark } = useBookmark();
+  const [formAction, setFormAction] = useState<BookmarkFormState | null>(null);
   const [isFolderContentVisible, setIsFolderContentVisible] = useState(false);
 
   const [, drop] = useDrop(
@@ -56,75 +62,145 @@ const CollapsibleBookmark = ({ data }: Props) => {
   };
 
   return (
-    <div ref={drop} className="overflow-hidden text-sm">
-      <div className="flex justify-between items-center group">
-        <div
-          ref={drag}
-          onClick={toggleFolderOpenState}
-          className={cn("flex items-center gap-2 cursor-pointer mb-2", {
-            "opacity-70": isDragging,
-          })}
-        >
-          {isFolderContentVisible ? (
-            <FolderOpen size={18} />
-          ) : (
-            <Folder size={18} />
-          )}
-
-          {titleCase(data.title || "Unamed Folder")}
-        </div>
-
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CustomMenu
-            trigger={<EllipsisVertical size={16} />}
-            content={[
-              {
-                items: [
-                  {
-                    label: "Remove",
-                    className: "text-destructive font-semibold",
-                    async onClick() {
-                      removeBookmark(data.id, "folder");
-                    },
-                  },
-                ],
-              },
-            ]}
-          />
-        </div>
-      </div>
-
-      <div
-        className={cn(
-          "ms-[26px] max-h-0 transition-all duration-100 ease-in-out",
-          {
-            "max-h-[20000px]": isFolderContentVisible,
-          }
-        )}
+    <>
+      <CustomModal
+        isOpen={Boolean(formAction)}
+        onOpenChange={() => setFormAction(null)}
       >
-        {data?.children?.map((bookmark) => {
-          if (bookmark.url) {
-            return (
-              <BookmarkLink
-                key={bookmark.id}
-                className="mb-2"
-                bookmark={bookmark}
-                iconSize={18}
-              />
-            );
-          }
+        <CustomTabs
+          className="mt-1"
+          tabs={[
+            {
+              name: "Link",
+              title: "Manage Link",
+              hidden:
+                formAction?.action === "update" &&
+                formAction.variant === "folder",
+              content: (
+                <BookmarkLinkForm
+                  {...formAction}
+                  onComplete={() => setFormAction(null)}
+                />
+              ),
+            },
+            {
+              name: "Folder",
+              title: "Manage Folder",
+              hidden:
+                formAction?.action === "update" &&
+                formAction.variant === "link",
+              content: (
+                <BookmarkFolderForm
+                  {...formAction}
+                  onComplete={() => setFormAction(null)}
+                />
+              ),
+            },
+          ]}
+        />
+      </CustomModal>
 
-          return <CollapsibleBookmark key={bookmark.id} data={bookmark} />;
-        })}
+      <div ref={drop} className="overflow-hidden text-sm">
+        <div className="flex justify-between items-center group">
+          <div
+            ref={drag}
+            onClick={toggleFolderOpenState}
+            className={cn("flex items-center gap-2 cursor-pointer mb-2", {
+              "opacity-70": isDragging,
+            })}
+          >
+            {isFolderContentVisible ? (
+              <FolderOpen size={18} />
+            ) : (
+              <Folder size={18} />
+            )}
 
-        {!data?.children?.length && (
-          <div className="flex items-center gap-2 opacity-50 mb-2">
-            <BanIcon size={18} />
-            <span className="text-xs">Nothing To See</span>
+            {titleCase(data.title || "Unamed Folder")}
           </div>
-        )}
+
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <CustomMenu
+              trigger={<EllipsisVertical size={16} />}
+              content={[
+                {
+                  items: [
+                    {
+                      label: <div>New</div>,
+                      async onClick() {
+                        setFormAction({
+                          action: "create",
+                          parentId: data.parentId ?? "",
+                        });
+                      },
+                    },
+                    {
+                      label: <div>Update</div>,
+                      async onClick() {
+                        setFormAction({
+                          action: "update",
+                          bookmark: data,
+                          variant: "folder",
+                        });
+                      },
+                    },
+                    {
+                      label: <div>Remove</div>,
+                      variant: "danger",
+                      async onClick() {
+                        removeBookmark(data.id, "folder");
+                      },
+                    },
+                  ],
+                },
+              ]}
+            />
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "ms-[26px] max-h-0 transition-all duration-100 ease-in-out",
+            {
+              "max-h-[20000px]": isFolderContentVisible,
+            }
+          )}
+        >
+          {data?.children?.map((bookmark) => {
+            if (bookmark.url) {
+              return (
+                <BookmarkLink
+                  key={bookmark.id}
+                  className="mb-2"
+                  bookmark={bookmark}
+                  iconSize={18}
+                  actions={{
+                    remove() {
+                      removeBookmark(bookmark.id, "link");
+                    },
+                    update() {
+                      setFormAction({
+                        bookmark,
+                        action: "update",
+                        variant: "link",
+                      });
+                    },
+                  }}
+                />
+              );
+            }
+
+            return <CollapsibleBookmark key={bookmark.id} data={bookmark} />;
+          })}
+
+          {!data?.children?.length && (
+            <div className="flex items-center gap-2 opacity-50 mb-2">
+              <BanIcon size={18} />
+              <span className="text-xs">Nothing To See</span>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

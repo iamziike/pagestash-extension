@@ -23,6 +23,7 @@
         "bookmarks",
         "storage",
         "favicon",
-        "history"
+        "history",
+        "tabs"
     ]
 }

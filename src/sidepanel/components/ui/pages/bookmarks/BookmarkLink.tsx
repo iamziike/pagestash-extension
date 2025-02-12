@@ -1,5 +1,5 @@
 import CustomMenu from "../../custom-menu";
-import useBookmark, { bookmarkHelpers } from "@/sidepanel/store/useBookmark";
+import { bookmarkHelpers } from "@/sidepanel/store/useBookmark";
 import { cn, copyToClipboard, navigateWindowTo } from "@/utils";
 import { Bookmark, DraggedItem } from "@/models";
 import { titleCase } from "title-case";
@@ -11,10 +11,13 @@ interface Props {
   bookmark: Bookmark;
   className?: string;
   iconSize: number;
+  actions: {
+    update: () => void;
+    remove: () => void;
+  };
 }
 
-const BookmarkLink = ({ bookmark, className, iconSize }: Props) => {
-  const { removeBookmark } = useBookmark();
+const BookmarkLink = ({ bookmark, className, iconSize, actions }: Props) => {
   const [{ isDragging }, drag] = useDrag<
     DraggedItem,
     unknown,
@@ -61,11 +64,17 @@ const BookmarkLink = ({ bookmark, className, iconSize }: Props) => {
             {
               items: [
                 {
-                  label: "Remove",
+                  label: <div>Update</div>,
+                  onClick: actions.update,
+                },
+              ],
+            },
+            {
+              items: [
+                {
+                  label: <div>Remove</div>,
                   className: "text-destructive font-semibold",
-                  async onClick() {
-                    removeBookmark(bookmark.id, "link");
-                  },
+                  onClick: actions.remove,
                 },
               ],
             },

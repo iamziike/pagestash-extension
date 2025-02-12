@@ -1,4 +1,5 @@
 import { Fragment } from "react/jsx-runtime";
+import { cn } from "@/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,16 +8,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
-import { cn } from "@/utils";
 
 interface Props {
   trigger: React.ReactElement | string;
   content: {
     title?: React.ReactElement | string;
     items: {
-      label: React.ReactElement | string;
-      onClick: VoidFunction;
+      label: React.ReactElement;
+      onClick?: React.MouseEventHandler<HTMLDivElement>;
       className?: string;
+      variant?: "danger" | "warning" | "default";
     }[];
   }[];
 }
@@ -25,7 +26,7 @@ const CustomMenu = ({ content, trigger }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+      <DropdownMenuContent align="end">
         {content.map(({ items, title }, index) => (
           <Fragment key={index}>
             {title && (
@@ -34,15 +35,24 @@ const CustomMenu = ({ content, trigger }: Props) => {
                 <DropdownMenuSeparator />
               </>
             )}
-            {items.map(({ label, onClick, className }, index) => (
-              <DropdownMenuItem
-                className={cn("font-light", className)}
-                onClick={onClick}
-                key={index}
-              >
-                {label}
-              </DropdownMenuItem>
-            ))}
+            {items.map(
+              ({ label, onClick, className, variant = "default" }, index) => (
+                <DropdownMenuItem
+                  className={cn(
+                    "text-xs hover:font-semibold hover:bg-accent hover:text-accent-foreground [&>*]:w-full p-0 [&>*]:px-2 [&>*]:py-1.5",
+                    {
+                      "text-destructive hover:text-destructive focus:text-destructive [&>*]:focus:text-destructive":
+                        variant === "danger",
+                    },
+                    className
+                  )}
+                  onClick={onClick}
+                  key={index}
+                >
+                  {label}
+                </DropdownMenuItem>
+              )
+            )}
           </Fragment>
         ))}
       </DropdownMenuContent>
