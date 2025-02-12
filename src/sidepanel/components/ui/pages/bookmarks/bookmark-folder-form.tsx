@@ -50,17 +50,17 @@ const BookmarkFolderForm = ({ onComplete, ...props }: Props) => {
       await updateBookmark(props?.bookmark?.id ?? "", {
         title: values.title,
       });
-      onComplete();
-      return;
     }
 
     if (props.action === "create") {
       addNewBookmark({
-        index: 1,
+        index: 0,
         parentId: props.parentId,
         title: values.title,
       });
     }
+
+    onComplete();
   };
 
   return (

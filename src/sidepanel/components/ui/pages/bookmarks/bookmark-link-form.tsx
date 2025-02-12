@@ -1,13 +1,13 @@
 import CustomInput from "../../custom-input";
 import useBookmark from "@/sidepanel/store/useBookmark";
-import { cn, getCurrentTab } from "@/utils";
 import { z } from "zod";
 import { Label } from "../../label";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../button";
-import { BookmarkFormState } from "@/utils/bookmarks/models";
+import { useForm } from "react-hook-form";
 import { Textarea } from "../../textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { BookmarkFormState } from "@/utils/bookmarks/models";
+import { cn, getCurrentTab } from "@/utils";
 
 type Props = Partial<BookmarkFormState> & {
   onComplete: VoidFunction;
@@ -21,7 +21,7 @@ const BookmarkFormSchema = z.object({
 });
 
 const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
-  const { updateBookmark } = useBookmark();
+  const { updateBookmark, addNewBookmark } = useBookmark();
   const {
     handleSubmit: onSubmit,
     register,
@@ -58,8 +58,18 @@ const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
         title: values.title,
         url: values.url,
       });
-      onComplete();
     }
+
+    if (props.action === "create") {
+      await addNewBookmark({
+        index: 0,
+        parentId: props.parentId,
+        title: values.title,
+        url: values.url,
+      });
+    }
+
+    onComplete();
   };
 
   return (

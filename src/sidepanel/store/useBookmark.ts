@@ -24,7 +24,10 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
 
     return {
       bookmark: null,
-      addNewBookmark() {},
+      async addNewBookmark(values) {
+        await chrome.bookmarks.create(values);
+        updateBookmarkList();
+      },
       async removeBookmark(id: string, type = "link") {
         if (type === "link") {
           await chrome.bookmarks.remove(id);

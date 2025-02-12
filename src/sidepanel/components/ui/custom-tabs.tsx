@@ -21,7 +21,7 @@ const CustomTabs = ({ tabs, defaultValue, className }: Props) => {
         {tabs.map(
           ({ name, title, hidden }) =>
             !hidden && (
-              <TabsTrigger className="font-light px-0" value={name}>
+              <TabsTrigger key={name} className="font-light px-0" value={name}>
                 {title}
               </TabsTrigger>
             )
@@ -30,7 +30,7 @@ const CustomTabs = ({ tabs, defaultValue, className }: Props) => {
       {tabs.map(
         ({ name, content, hidden }) =>
           !hidden && (
-            <TabsContent className="mt-4" value={name}>
+            <TabsContent key={name} className="mt-4" value={name}>
               {content}
             </TabsContent>
           )

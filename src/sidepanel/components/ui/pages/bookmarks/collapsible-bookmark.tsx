@@ -92,7 +92,10 @@ const CollapsibleBookmark = ({ data }: Props) => {
               content: (
                 <BookmarkFolderForm
                   {...formAction}
-                  onComplete={() => setFormAction(null)}
+                  onComplete={() => {
+                    setFormAction(null);
+                    setIsFolderContentVisible(true);
+                  }}
                 />
               ),
             },
@@ -129,7 +132,7 @@ const CollapsibleBookmark = ({ data }: Props) => {
                       async onClick() {
                         setFormAction({
                           action: "create",
-                          parentId: data.parentId ?? "",
+                          parentId: data.id ?? "",
                         });
                       },
                     },
