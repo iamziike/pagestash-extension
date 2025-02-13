@@ -24,7 +24,7 @@ dist-ssr
 *.sw?
 
 # others
-todo.todo
+todo.todo*
 pnpm-lock.yaml
 yarn.lock
 package-lock.json
