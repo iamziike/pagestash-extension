@@ -18,13 +18,15 @@ import { BookmarkNode, DraggedItem } from "@/models";
 
 interface Props {
   data: BookmarkNode;
+  isDefaultOpen?: boolean;
 }
 
-const CollapsibleBookmark = ({ data }: Props) => {
+const CollapsibleBookmark = ({ data, isDefaultOpen = false }: Props) => {
   const favourite = useFavourite();
   const { moveBookmark, removeBookmark } = useBookmark();
   const [formAction, setFormAction] = useState<BookmarkFormState | null>(null);
-  const [isFolderContentVisible, setIsFolderContentVisible] = useState(false);
+  const [isFolderContentVisible, setIsFolderContentVisible] =
+    useState(isDefaultOpen);
 
   const [, drop] = useDrop(
     () => ({

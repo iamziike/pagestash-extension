@@ -50,10 +50,10 @@ const BookmarksList = ({
         />
 
         {data?.parentId ? (
-          <CollapsibleBookmark key={data?.id} data={data} />
+          <CollapsibleBookmark key={data?.id} data={data} isDefaultOpen />
         ) : (
           data?.children?.map((data) => (
-            <CollapsibleBookmark key={data?.id} data={data} />
+            <CollapsibleBookmark key={data?.id} data={data} isDefaultOpen />
           ))
         )}
       </main>
