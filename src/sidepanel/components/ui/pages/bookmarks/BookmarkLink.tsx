@@ -1,23 +1,26 @@
 import CustomMenu from "../../custom-menu";
+import useFavourite from "@/sidepanel/store/useFavourite";
 import { bookmarkHelpers } from "@/sidepanel/store/useBookmark";
 import { cn, copyToClipboard, navigateWindowTo } from "@/utils";
-import { Bookmark, DraggedItem } from "@/models";
+import { BookmarkNode, DraggedItem } from "@/models";
 import { titleCase } from "title-case";
 import { useDrag } from "react-dnd";
 import { DRAGGABLE_ITEMS } from "@/constants";
 import { EllipsisVertical } from "lucide-react";
 
 interface Props {
-  bookmark: Bookmark;
+  bookmark: BookmarkNode;
   className?: string;
   iconSize: number;
   actions: {
     update: () => void;
     remove: () => void;
+    favourite: () => void;
   };
 }
 
 const BookmarkLink = ({ bookmark, className, iconSize, actions }: Props) => {
+  const favourite = useFavourite();
   const [{ isDragging }, drag] = useDrag<
     DraggedItem,
     unknown,
@@ -66,6 +69,15 @@ const BookmarkLink = ({ bookmark, className, iconSize, actions }: Props) => {
                 {
                   label: <div>Update</div>,
                   onClick: actions.update,
+                },
+              ],
+            },
+            {
+              items: [
+                {
+                  hidden: favourite.has(bookmark.id, "link"),
+                  label: <div>Add to Favourite</div>,
+                  onClick: actions.favourite,
                 },
               ],
             },

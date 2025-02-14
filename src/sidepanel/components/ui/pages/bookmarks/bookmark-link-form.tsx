@@ -6,7 +6,7 @@ import { Button } from "../../button";
 import { useForm } from "react-hook-form";
 import { Textarea } from "../../textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BookmarkFormState } from "@/utils/bookmarks/models";
+import { BookmarkFormState } from "@/models";
 import { cn, getCurrentTab } from "@/utils";
 
 type Props = Partial<BookmarkFormState> & {

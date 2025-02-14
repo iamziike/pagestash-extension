@@ -5,20 +5,23 @@ import CustomModal from "../../custom-modal";
 import CustomTabs from "../../custom-tabs";
 import BookmarkFolderForm from "./bookmark-folder-form";
 import BookmarkLinkForm from "./bookmark-link-form";
+import useFavourite from "@/sidepanel/store/useFavourite";
 import { cn } from "@/utils";
-import { Bookmark, DraggedItem } from "@/models";
 import { useDrag, useDrop } from "react-dnd";
 import { DRAGGABLE_ITEMS } from "@/constants";
 import { BanIcon, EllipsisVertical, Folder, FolderOpen } from "lucide-react";
 import { titleCase } from "title-case";
 import { useState } from "react";
-import { BookmarkFormState } from "@/utils/bookmarks/models";
+import { BookmarkFormState } from "@/models";
+import { toast } from "sonner";
+import { BookmarkNode, DraggedItem } from "@/models";
 
 interface Props {
-  data: Bookmark;
+  data: BookmarkNode;
 }
 
 const CollapsibleBookmark = ({ data }: Props) => {
+  const favourite = useFavourite();
   const { moveBookmark, removeBookmark } = useBookmark();
   const [formAction, setFormAction] = useState<BookmarkFormState | null>(null);
   const [isFolderContentVisible, setIsFolderContentVisible] = useState(false);
@@ -94,7 +97,6 @@ const CollapsibleBookmark = ({ data }: Props) => {
                   {...formAction}
                   onComplete={() => {
                     setFormAction(null);
-                    setIsFolderContentVisible(true);
                   }}
                 />
               ),
@@ -130,6 +132,7 @@ const CollapsibleBookmark = ({ data }: Props) => {
                     {
                       label: <div>New</div>,
                       async onClick() {
+                        setIsFolderContentVisible(true);
                         setFormAction({
                           action: "create",
                           parentId: data.id ?? "",
@@ -139,6 +142,7 @@ const CollapsibleBookmark = ({ data }: Props) => {
                     {
                       label: <div>Update</div>,
                       async onClick() {
+                        setIsFolderContentVisible(true);
                         setFormAction({
                           action: "update",
                           bookmark: data,
@@ -147,10 +151,26 @@ const CollapsibleBookmark = ({ data }: Props) => {
                       },
                     },
                     {
+                      hidden: favourite.has(data.id, "folder"),
+                      label: <div>Add to Favourite</div>,
+                      async onClick() {
+                        setIsFolderContentVisible(true);
+                        favourite.add({
+                          id: data.id,
+                          type: "folder",
+                        });
+                        toast("Added to Favourites");
+                      },
+                    },
+                    {
                       label: <div>Remove</div>,
                       variant: "danger",
                       async onClick() {
-                        removeBookmark(data.id, "folder");
+                        setIsFolderContentVisible(false);
+                        await removeBookmark(data.id, "folder");
+                        if (favourite.has(data.id, "folder")) {
+                          favourite.delete(data.id, "folder");
+                        }
                       },
                     },
                   ],
@@ -177,8 +197,18 @@ const CollapsibleBookmark = ({ data }: Props) => {
                   bookmark={bookmark}
                   iconSize={18}
                   actions={{
-                    remove() {
-                      removeBookmark(bookmark.id, "link");
+                    favourite() {
+                      favourite.add({
+                        id: bookmark.id,
+                        type: "link",
+                      });
+                      toast("Added to Favourites");
+                    },
+                    async remove() {
+                      await removeBookmark(bookmark.id, "link");
+                      if (favourite.has(data.id, "link")) {
+                        favourite.delete(data.id, "link");
+                      }
                     },
                     update() {
                       setFormAction({

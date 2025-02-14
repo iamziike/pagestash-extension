@@ -56,8 +56,15 @@ const DatePickerWithRange = ({
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="range"
-            onSelect={onChange}
-            selected={{ from: from, to: to && getEndOfDay(to) }}
+            onSelect={(props) => {
+              if (props?.from) {
+                onChange({ ...props, to: getEndOfDay(props.to || new Date()) });
+                return;
+              }
+
+              onChange(props);
+            }}
+            selected={{ from, to }}
             classNames={{
               day_today: cn({
                 "bg-transparent": from || to,

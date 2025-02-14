@@ -1,4 +1,4 @@
-import { RecentlyVisitedFilterType } from "@/utils/recently-visited/models";
+import { RecentlyVisitedFilterType } from "@/models";
 import { useCallback } from "react";
 
 const useRecentlyVisited = () => {

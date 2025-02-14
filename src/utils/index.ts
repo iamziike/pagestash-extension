@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { clsx, type ClassValue } from "clsx";
 import { isValid } from "date-fns";
 import { toast } from "sonner";
@@ -56,3 +57,8 @@ export const getCurrentTab = async () => {
     url: tab?.url,
   };
 };
+
+export const getRandomID = () => {
+  return uuidv4();
+};
+

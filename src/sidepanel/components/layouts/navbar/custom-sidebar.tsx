@@ -1,11 +1,11 @@
 import Logo from "../../ui/logo";
-import BookmarkSearch from "../../ui/bookmarks-search";
 import ThemeSelect from "../../ui/theme-select";
+import CustomSearch from "../../ui/custom-search";
 import { Separator } from "../../ui/separator";
 import { PAGES } from "@/constants";
 import { PanelLeft } from "lucide-react";
 import { cn } from "@/utils";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +20,7 @@ const LINKS = [PAGES.HOME, PAGES.BOOKMARKS, PAGES.SETTINGS, PAGES.CREDENTIALS];
 
 const CustomSidebar = () => {
   const { toggleSidebar } = useSidebar();
+  const navigate = useNavigate();
   const location = useLocation();
 
   return (
@@ -45,7 +46,20 @@ const CustomSidebar = () => {
           </SidebarHeader>
           <SidebarContent className="pt-5 px-4">
             <SidebarGroup className="p-0">
-              <BookmarkSearch className="selection:bg-sidebar-primary selection:text-sidebar-primary-foreground" />
+              <CustomSearch
+                placeholder="Search for Bookmarks..."
+                className="selection:bg-sidebar-primary selection:text-sidebar-primary-foreground"
+                handleSubmit={({ query }) => {
+                  if (query) {
+                    const searchParams = new URLSearchParams();
+                    searchParams.set("query", query);
+                    navigate(
+                      `${PAGES.BOOKMARKS.path}?${searchParams.toString()}`
+                    );
+                    toggleSidebar();
+                  }
+                }}
+              />
             </SidebarGroup>
             <SidebarGroup className="mt-4 space-y-5">
               {LINKS.map(({ path, label, icon: Icon }) => (

@@ -18,6 +18,7 @@ interface Props {
       onClick?: React.MouseEventHandler<HTMLDivElement>;
       className?: string;
       variant?: "danger" | "warning" | "default";
+      hidden?: boolean;
     }[];
   }[];
 }
@@ -36,22 +37,26 @@ const CustomMenu = ({ content, trigger }: Props) => {
               </>
             )}
             {items.map(
-              ({ label, onClick, className, variant = "default" }, index) => (
-                <DropdownMenuItem
-                  className={cn(
-                    "text-xs hover:font-semibold hover:bg-accent hover:text-accent-foreground [&>*]:w-full p-0 [&>*]:px-2 [&>*]:py-1.5",
-                    {
-                      "text-destructive hover:text-destructive focus:text-destructive [&>*]:focus:text-destructive":
-                        variant === "danger",
-                    },
-                    className
-                  )}
-                  onClick={onClick}
-                  key={index}
-                >
-                  {label}
-                </DropdownMenuItem>
-              )
+              (
+                { label, onClick, className, variant = "default", hidden },
+                index
+              ) =>
+                !hidden && (
+                  <DropdownMenuItem
+                    className={cn(
+                      "text-xs hover:font-semibold hover:bg-accent hover:text-accent-foreground [&>*]:w-full p-0 [&>*]:px-2 [&>*]:py-1.5",
+                      {
+                        "text-destructive hover:text-destructive focus:text-destructive [&>*]:focus:text-destructive":
+                          variant === "danger",
+                      },
+                      className
+                    )}
+                    onClick={onClick}
+                    key={index}
+                  >
+                    {label}
+                  </DropdownMenuItem>
+                )
             )}
           </Fragment>
         ))}

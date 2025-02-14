@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../button";
 import { Textarea } from "../../textarea";
-import { BookmarkFormState } from "@/utils/bookmarks/models";
+import { BookmarkFormState } from "@/models";
 
 type Props = Partial<BookmarkFormState> & {
   onComplete: VoidFunction;
