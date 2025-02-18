@@ -3,6 +3,8 @@ import useBookmark, { bookmarkHelpers } from "@/sidepanel/store/useBookmark";
 import Favourites from "../ui/pages/favourites/favourites";
 import CustomSearch from "../ui/custom-search";
 import HomeLink from "../ui/pages/home/home-link";
+import isNull from "lodash/isNull";
+import EmptyState from "../ui/empty-state";
 import { ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +18,10 @@ const Home = () => {
   const [recentlyVisitedLinks, setRecentlyVisitedLinks] = useState<
     RecentlyVisitedLink[]
   >([]);
+
+  const bookmarkLinks = bookmarkHelpers.getAllBookmarkLinks(bookmark, {
+    maxLimit: 5,
+  });
 
   const fetchRecentlyVisitedLinks = useCallback(async () => {
     const response = await getRecentlyVisited({ query: "", maxResults: 3 });
@@ -53,6 +59,12 @@ const Home = () => {
               .map(({ url, id, title }) => (
                 <HomeLink key={id} title={title} url={url} />
               ))}
+
+            <EmptyState
+              visible={isNull(bookmarkLinks)}
+              title="No Bookmarks yet"
+              description="Start adding your bookmarks here for quick access"
+            />
           </div>
           <Link to={PAGES.BOOKMARKS.path} className="button">
             Show All
@@ -62,20 +74,22 @@ const Home = () => {
           </Link>
         </section>
 
-        <section>
-          <h2 className="font-extrabold text-xl">Recently Visited</h2>
-          <div className="mt-2 space-y-2">
-            {recentlyVisitedLinks?.map(({ title, url, id }) => (
-              <HomeLink key={id} title={title} url={url} />
-            ))}
-          </div>
-          <Link to={PAGES.RECENTLY_VISITED.path} className="button">
-            Show All
-            <span>
-              <ChevronRight />
-            </span>
-          </Link>
-        </section>
+        {Boolean(recentlyVisitedLinks.length) && (
+          <section>
+            <h2 className="font-extrabold text-xl">Recently Visited</h2>
+            <div className="mt-2 space-y-2">
+              {recentlyVisitedLinks?.map(({ title, url, id }) => (
+                <HomeLink key={id} title={title} url={url} />
+              ))}
+            </div>
+            <Link to={PAGES.RECENTLY_VISITED.path} className="button">
+              Show All
+              <span>
+                <ChevronRight />
+              </span>
+            </Link>
+          </section>
+        )}
       </main>
     </section>
   );
