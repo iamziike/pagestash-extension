@@ -81,7 +81,7 @@ const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
             <CustomInput
               {...register("title")}
               placeholder="Title"
-              isIconHidden
+              iconClassName="hidden"
               wrapperClassName={cn({
                 "border border-destructive": formState.errors.title,
               })}
@@ -94,7 +94,7 @@ const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
             <CustomInput
               {...register("url")}
               placeholder="URL"
-              isIconHidden
+              iconClassName="hidden"
               wrapperClassName={cn({
                 "border border-destructive": formState.errors.url,
               })}

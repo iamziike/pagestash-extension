@@ -7,13 +7,13 @@ import { Button } from "./button";
 
 export interface CustomInputProps
   extends InputHTMLAttributes<HTMLInputElement> {
-  isIconHidden?: boolean;
   onClear?: VoidFunction;
+  iconClassName?: string;
   wrapperClassName?: string;
 }
 
 const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
-  ({ isIconHidden, onClear, wrapperClassName, ...props }, ref) => {
+  ({ onClear, wrapperClassName, iconClassName, ...props }, ref) => {
     const { highlightInput } = useSettings();
 
     return (
@@ -40,11 +40,9 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
             props.className
           )}
         />
-        {!isIconHidden && (
-          <Button variant="ghost" className="px-0">
-            <SendHorizonal size={16} />
-          </Button>
-        )}
+        <Button variant="ghost" className={cn("px-0", iconClassName)}>
+          <SendHorizonal size={16} />
+        </Button>
       </div>
     );
   }

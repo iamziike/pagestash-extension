@@ -64,4 +64,10 @@ export const RECENT_VISITED_LINKS_FILTERS: FilterOption<RecentLinksVisitedURLSea
       name: "visitStartDate",
       secondaryName: "visitEndDate",
     },
+    {
+      type: "number",
+      label: "Links to Display",
+      name: "pageSize",
+      placeholder: "100",
+    },
   ];

@@ -24,10 +24,11 @@ export type FolderLink = "folder" | "link";
 export interface FilterOption<
   T extends CustomObject<string> = CustomObject<string>
 > {
-  type: "input" | "date-range" | "select";
+  type: "input" | "date-range" | "select" | "number";
   label: string;
   name: keyof T;
   secondaryName?: keyof T;
+  placeholder?: string;
 }
 
 export type URLDefaultSearchParam = Partial<{

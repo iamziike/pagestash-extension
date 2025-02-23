@@ -1,4 +1,5 @@
 import DatePickerWithRange from "./date-picker";
+import CustomInput from "./custom-input";
 import { cn, toDate } from "@/utils";
 import { Label } from "./label";
 import { SlidersHorizontal } from "lucide-react";
@@ -36,7 +37,7 @@ const Filters = <T extends CustomObject<string>>({
             </AccordionTrigger>
           </div>
           <AccordionContent>
-            <form className="bg-accent px-4 py-3 rounded-md flex justify-between flex-wrap gap-3">
+            <div className="bg-accent px-4 py-3 rounded-md flex justify-between flex-wrap gap-3">
               {filters.map((filter) => {
                 const filterName = filter.name as string;
 
@@ -73,8 +74,31 @@ const Filters = <T extends CustomObject<string>>({
                     </Label>
                   );
                 }
+
+                if (filter.type === "number") {
+                  const handleSubmit = (value: string) => {
+                    searchParams.set(filterName, value?.trim()?.split(".")[0]);
+                    onChange(searchParams);
+                  };
+
+                  return (
+                    <Label key={filterName} className="space-y-2 flex-1">
+                      <div>{filter?.label}</div>
+                      <CustomInput
+                        placeholder={filter?.placeholder ?? filter?.label}
+                        className="py-0"
+                        type="number"
+                        iconClassName="opacity-0 pointer-events-none"
+                        wrapperClassName="bg-background rounded-md"
+                        onChange={({ target }) => {
+                          handleSubmit(target?.value);
+                        }}
+                      />
+                    </Label>
+                  );
+                }
               })}
-            </form>
+            </div>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
