@@ -49,7 +49,7 @@ const CustomSidebar = () => {
               <CustomSearch
                 placeholder="Search for Bookmarks..."
                 className="selection:bg-sidebar-primary selection:text-sidebar-primary-foreground"
-                handleSubmit={({ query }) => {
+                onChange={({ query }) => {
                   if (query) {
                     const searchParams = new URLSearchParams();
                     searchParams.set("query", query);

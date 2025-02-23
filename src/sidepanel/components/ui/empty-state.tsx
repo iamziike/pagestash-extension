@@ -3,7 +3,7 @@ import { BookmarkPlus } from "lucide-react";
 interface Props {
   visible?: boolean;
   title: string;
-  description: string;
+  description: React.ReactElement | string;
 }
 
 const EmptyState = ({ visible = true, title, description }: Props) => {

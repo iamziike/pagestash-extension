@@ -1,3 +1,8 @@
+import {
+  BookmarkURLSearchParam,
+  FilterOption,
+  RecentLinksVisitedURLSearchParam,
+} from "@/models";
 import { Bookmark, Home, Key, Settings } from "lucide-react";
 
 export const APP_NAME = "PageStash";
@@ -37,25 +42,26 @@ export const PAGES = {
   },
 } as const;
 
-export const BOOKMARK_FILTERS = [
+export const BOOKMARK_FILTERS: FilterOption<BookmarkURLSearchParam>[] = [
   {
     type: "date-range",
     label: "Created From",
     name: "createdStartDate",
     secondaryName: "createdEndDate",
   },
-] as const;
+];
 
 export const DRAGGABLE_ITEMS = {
   FOLDER: "FOLDER",
   LINK: "LINK",
 } as const;
 
-export const RECENT_VISITED_LINKS_FILTERS = [
-  {
-    type: "date-range",
-    label: "Visited From",
-    name: "visitStartAt",
-    secondaryName: "visitEndAt",
-  },
-] as const;
+export const RECENT_VISITED_LINKS_FILTERS: FilterOption<RecentLinksVisitedURLSearchParam>[] =
+  [
+    {
+      type: "date-range",
+      label: "Visited From",
+      name: "visitStartDate",
+      secondaryName: "visitEndDate",
+    },
+  ];

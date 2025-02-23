@@ -19,9 +19,14 @@ import { BookmarkNode, DraggedItem } from "@/models";
 interface Props {
   data: BookmarkNode;
   isDefaultOpen?: boolean;
+  isRoot?: boolean;
 }
 
-const CollapsibleBookmark = ({ data, isDefaultOpen = false }: Props) => {
+const CollapsibleBookmark = ({
+  data,
+  isDefaultOpen = false,
+  isRoot = false,
+}: Props) => {
   const favourite = useFavourite();
   const { moveBookmark, removeBookmark } = useBookmark();
   const [formAction, setFormAction] = useState<BookmarkFormState | null>(null);
@@ -125,61 +130,63 @@ const CollapsibleBookmark = ({ data, isDefaultOpen = false }: Props) => {
             {titleCase(data.title || "Unamed Folder")}
           </div>
 
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-            <CustomMenu
-              trigger={<EllipsisVertical size={16} />}
-              content={[
-                {
-                  items: [
-                    {
-                      label: <div>New</div>,
-                      async onClick() {
-                        setIsFolderContentVisible(true);
-                        setFormAction({
-                          action: "create",
-                          parentId: data.id ?? "",
-                        });
+          {!isRoot && (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <CustomMenu
+                trigger={<EllipsisVertical size={16} />}
+                content={[
+                  {
+                    items: [
+                      {
+                        label: <div>New</div>,
+                        async onClick() {
+                          setIsFolderContentVisible(true);
+                          setFormAction({
+                            action: "create",
+                            parentId: data.id ?? "",
+                          });
+                        },
                       },
-                    },
-                    {
-                      label: <div>Update</div>,
-                      async onClick() {
-                        setIsFolderContentVisible(true);
-                        setFormAction({
-                          action: "update",
-                          bookmark: data,
-                          variant: "folder",
-                        });
+                      {
+                        label: <div>Update</div>,
+                        async onClick() {
+                          setIsFolderContentVisible(true);
+                          setFormAction({
+                            action: "update",
+                            bookmark: data,
+                            variant: "folder",
+                          });
+                        },
                       },
-                    },
-                    {
-                      hidden: favourite.has(data.id, "folder"),
-                      label: <div>Add to Favourite</div>,
-                      async onClick() {
-                        setIsFolderContentVisible(true);
-                        favourite.add({
-                          id: data.id,
-                          type: "folder",
-                        });
-                        toast("Added to Favourites");
+                      {
+                        hidden: favourite.has(data.id, "folder"),
+                        label: <div>Add to Favourite</div>,
+                        async onClick() {
+                          setIsFolderContentVisible(true);
+                          favourite.add({
+                            id: data.id,
+                            type: "folder",
+                          });
+                          toast("Added to Favourites");
+                        },
                       },
-                    },
-                    {
-                      label: <div>Remove</div>,
-                      variant: "danger",
-                      async onClick() {
-                        setIsFolderContentVisible(false);
-                        await removeBookmark(data.id, "folder");
-                        if (favourite.has(data.id, "folder")) {
-                          favourite.delete(data.id, "folder");
-                        }
+                      {
+                        label: <div>Remove</div>,
+                        variant: "danger",
+                        async onClick() {
+                          setIsFolderContentVisible(false);
+                          await removeBookmark(data.id, "folder");
+                          if (favourite.has(data.id, "folder")) {
+                            favourite.delete(data.id, "folder");
+                          }
+                        },
                       },
-                    },
-                  ],
-                },
-              ]}
-            />
-          </div>
+                    ],
+                  },
+                ]}
+              />
+            </div>
+          )}
         </div>
 
         <div

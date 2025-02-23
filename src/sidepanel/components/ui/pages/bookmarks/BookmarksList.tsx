@@ -3,14 +3,18 @@ import CollapsibleBookmark from "./collapsible-bookmark";
 import Filters from "../../filters";
 import EmptyState from "../../empty-state";
 import Loading from "../../loading";
-import { BookmarkNode } from "@/models";
 import { BOOKMARK_FILTERS } from "@/constants";
 import { SetURLSearchParams } from "react-router-dom";
+import {
+  BookmarkNode,
+  BookmarkURLSearchParam,
+  TypedURLSearchParam,
+} from "@/models";
 
 interface Props {
-  data: BookmarkNode | null;
+  data: BookmarkNode | BookmarkNode[] | null;
   isLoading: boolean;
-  filters: URLSearchParams;
+  filters: TypedURLSearchParam<BookmarkURLSearchParam>;
   onFiltersChange: SetURLSearchParams;
 }
 
@@ -20,15 +24,70 @@ const BookmarksList = ({
   filters,
   onFiltersChange,
 }: Props) => {
+  const renderView = () => {
+    if ((!data || (data instanceof Array && !data?.length)) && !isLoading) {
+      const dateFilters = filters.get("createdStartDate");
+      const searchTerm = filters.get("query");
+
+      const hasFilters = dateFilters || searchTerm;
+      return (
+        <EmptyState
+          title={hasFilters ? "No Results" : "No Bookmarks yet"}
+          description={
+            hasFilters ? (
+              <>
+                No results found for {searchTerm || "filter"}. Try adjusting
+                your it.
+              </>
+            ) : (
+              "Start adding your bookmarks here for quick access"
+            )
+          }
+        />
+      );
+    }
+
+    if (data instanceof Array) {
+      return (
+        <CollapsibleBookmark
+          isRoot
+          isDefaultOpen
+          data={{
+            id: "0",
+            title: "Results",
+            children: data,
+          }}
+        />
+      );
+    }
+
+    if (data?.parentId) {
+      return <CollapsibleBookmark data={data} isDefaultOpen />;
+    }
+
+    if (data) {
+      return data?.children?.map?.((child) => (
+        <CollapsibleBookmark key={child?.id} data={child} isDefaultOpen />
+      ));
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    filters.set("query", query);
+    onFiltersChange(filters);
+  };
+
   return (
     <section className="py-6 flex flex-col flex-1 h-full">
       <header>
         <CustomSearch
           defaultValue={filters.get("query") ?? ""}
           placeholder="Search for Bookmarks..."
-          handleSubmit={({ query = "" }) => {
-            filters.set("query", query);
-            onFiltersChange(filters);
+          onBlur={({ target }) => {
+            handleSearch(target.value);
+          }}
+          onChange={({ query = "" }) => {
+            handleSearch(query);
           }}
         />
         <Filters
@@ -43,19 +102,7 @@ const BookmarksList = ({
       <main className="h-full flex-1 hidden-scrollbar">
         <Loading isLoading={isLoading} />
 
-        <EmptyState
-          visible={!data && !isLoading}
-          title="No Bookmarks yet"
-          description="Start adding your bookmarks here for quick access"
-        />
-
-        {data?.parentId ? (
-          <CollapsibleBookmark key={data?.id} data={data} isDefaultOpen />
-        ) : (
-          data?.children?.map((data) => (
-            <CollapsibleBookmark key={data?.id} data={data} isDefaultOpen />
-          ))
-        )}
+        {renderView()}
       </main>
     </section>
   );

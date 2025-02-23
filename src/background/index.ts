@@ -4,4 +4,8 @@ const openSidePanelOnActionClick = () => {
     .catch((error) => console.error(error));
 };
 
-openSidePanelOnActionClick();
+const main = async () => {
+  openSidePanelOnActionClick();
+};
+
+main();

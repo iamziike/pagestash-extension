@@ -12,6 +12,7 @@ interface Props {
   bookmark: BookmarkNode;
   className?: string;
   iconSize: number;
+  draggable?: boolean;
   actions: {
     update: () => void;
     remove: () => void;
@@ -19,13 +20,20 @@ interface Props {
   };
 }
 
-const BookmarkLink = ({ bookmark, className, iconSize, actions }: Props) => {
+const BookmarkLink = ({
+  bookmark,
+  className,
+  iconSize,
+  actions,
+  draggable = true,
+}: Props) => {
   const favourite = useFavourite();
   const [{ isDragging }, drag] = useDrag<
     DraggedItem,
     unknown,
     { isDragging: boolean }
   >(() => ({
+    canDrag: draggable,
     type: DRAGGABLE_ITEMS.LINK,
     item: {
       id: bookmark?.id,

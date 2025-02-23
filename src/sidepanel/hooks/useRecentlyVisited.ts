@@ -1,34 +1,64 @@
-import { RecentlyVisitedFilterType } from "@/models";
-import { useCallback, useState } from "react";
+import customLocalStorage from "@/utils/customLocalStorage";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { toDate } from "@/utils";
+import {
+  RecentLinksVisitedURLSearchParam,
+  TypedURLSearchParam,
+} from "@/models";
 
-const useRecentlyVisited = () => {
-  const [isFetchingRecentlyVisited, setIsFetchingRecentlyVisited] =
-    useState(false);
-
-  const getRecentlyVisited = useCallback(
-    async ({ maxResults, range, query }: RecentlyVisitedFilterType) => {
-      setIsFetchingRecentlyVisited(true);
-      const response = await chrome.history.search({
-        text: query ?? "",
-        maxResults,
-        startTime: range?.from?.getTime(),
-        endTime: range?.to?.getTime() || Date.now(),
-      });
-      setIsFetchingRecentlyVisited(false);
-      return response;
-    },
-    []
-  );
-
-  const removeRecentlyVisited = useCallback(({ url }: { url?: string }) => {
-    return chrome.history.deleteUrl({ url: url ?? "" });
-  }, []);
-
-  return {
-    getRecentlyVisited,
-    removeRecentlyVisited,
-    isFetchingRecentlyVisited,
+interface RecentlyVisitedState {
+  data: {
+    isDisclaimerDisplayed: boolean;
   };
-};
+}
 
-export default useRecentlyVisited;
+interface RecentlyVisitedStateActions {
+  getRecentlyVisited(
+    searchParams: TypedURLSearchParam<RecentLinksVisitedURLSearchParam>
+  ): Promise<chrome.history.HistoryItem[]>;
+  removeRecentlyVisited(url: string): void;
+  viewedDisclaimer(): void;
+}
+
+const RECENTLY_VISITED_LINKS_KEY_NAME = "RECENTLY_VISITED_LINKS_KEY_NAME";
+
+const useFavourite = create<
+  RecentlyVisitedState & RecentlyVisitedStateActions
+>()(
+  persist(
+    (setter) => ({
+      data: {
+        isDisclaimerDisplayed: false,
+      },
+      // async getRecentlyVisited({ maxResults, range, query }) {
+      async getRecentlyVisited(searchParams) {
+        const maxResults = Number(searchParams?.get("pageSize") || 100);
+        const query = searchParams?.get("query") ?? "";
+        const response = await chrome.history.search({
+          text: query,
+          maxResults,
+          startTime: toDate(searchParams?.get("visitStartDate"))?.getTime(),
+          endTime: toDate(searchParams?.get("visitEndDate"))?.getTime(),
+        });
+        return response;
+      },
+      removeRecentlyVisited(url) {
+        return chrome.history.deleteUrl({ url });
+      },
+
+      viewedDisclaimer() {
+        setter({
+          data: {
+            isDisclaimerDisplayed: true,
+          },
+        });
+      },
+    }),
+    customLocalStorage<RecentlyVisitedState>({
+      storeKey: RECENTLY_VISITED_LINKS_KEY_NAME,
+    })
+  )
+);
+
+export default useFavourite;

@@ -19,7 +19,7 @@ interface FavouriteStateActions {
   has(id: string, type: FavouriteBookmark["type"]): boolean;
 }
 
-const FAVOURITES_STORE_NAME = "FAVOURITES_STORE_NAME____";
+const FAVOURITES_STORE_NAME = "FAVOURITES_STORE_NAME";
 
 const useFavourite = create<FavouriteState & FavouriteStateActions>()(
   persist(

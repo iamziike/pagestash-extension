@@ -1,5 +1,13 @@
 // GLOBAL ////////////////////////////////
-import { RECENT_VISITED_LINKS_FILTERS } from "@/constants";
+export type CustomObject<T extends string = string> = {
+  [key in T]: string;
+};
+
+export interface TypedURLSearchParam<T extends Record<string, string>>
+  extends URLSearchParams {
+  get<K extends keyof T>(key: K): string | null;
+  set<K extends keyof T>(key: K, value: T[K]): void;
+}
 
 export interface DraggedItem {
   id: string;
@@ -13,12 +21,19 @@ export interface DateRange {
 
 export type FolderLink = "folder" | "link";
 
-export interface FilterOption {
+export interface FilterOption<
+  T extends CustomObject<string> = CustomObject<string>
+> {
   type: "input" | "date-range" | "select";
   label: string;
-  name: string;
-  secondaryName?: string;
+  name: keyof T;
+  secondaryName?: keyof T;
 }
+
+export type URLDefaultSearchParam = Partial<{
+  id: string;
+  query: string;
+}>;
 
 // BOOKMARK ////////////////////////////////
 export type BookmarkNode = chrome.bookmarks.BookmarkTreeNode;
@@ -38,32 +53,29 @@ export type BookmarkFormState =
       parentId: string;
     };
 
-export type BookmarkURLFilter = Partial<{
-  id: string;
+export type BookmarkURLSearchParam = URLDefaultSearchParam & {
   createdStartDate: string;
   createdEndDate: string;
-  search: string;
-}>;
+};
 
 // RECENTLY_VISIITED_LINKS ////////////////////////////////
 
 export type RecentlyVisitedFilterType = {
   maxResults?: number;
-  query?: string;
+  query?: string | null;
   range?: Partial<{
     to: Date;
     from: Date;
   }>;
 };
 
-export type RecentlyVisitedLink = chrome.history.HistoryItem;
-
-export type RecentlyVisitedLinkPageSearchParams = {
-  [key in
-    | (typeof RECENT_VISITED_LINKS_FILTERS)[number]["name"]
-    | (typeof RECENT_VISITED_LINKS_FILTERS)[number]["secondaryName"]
-    | "query"]: string;
+export type RecentLinksVisitedURLSearchParam = URLDefaultSearchParam & {
+  visitStartDate: string;
+  visitEndDate: string;
+  pageSize: string;
 };
+
+export type RecentlyVisitedLink = chrome.history.HistoryItem;
 
 // FAVOURITES ////////////////////////////////
 
@@ -71,4 +83,19 @@ export type FavouriteBookmark = {
   id: string;
   addedAt: string;
   type: FolderLink;
+};
+
+// PROMPT KEY
+export type PromptStore = {
+  provider: "google" | "openai";
+  apiKey: string;
+};
+
+export type GoogleErrorDetails = {
+  error?: {
+    status: "RESOURCE_EXHAUSTED";
+  };
+  errorDetails?: {
+    reason: "API_KEY_INVALID";
+  }[];
 };

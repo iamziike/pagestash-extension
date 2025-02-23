@@ -2,17 +2,19 @@ import { create } from "zustand";
 import { persist, type StorageValue } from "zustand/middleware";
 
 interface SettingsState {
-  credential: string;
   highlightInput: boolean;
   theme: "dark" | "light" | "system";
-  quickSearch: boolean;
+  searchMode:
+    | "quick-search" // Quick & less accurate
+    | "medium-search" // Medium speed, 80% accurate
+    | "slow-search"; // Slow but 100% accurate
 }
 
 interface SettingsStateActions {
   updateState(data: Partial<SettingsState>): void;
 }
 
-const SETTINGS_STORE_NAME = "SETTINGS_STORE_NAME__";
+const STORE_KEY = "SETTINGS_STORE_NAME";
 
 const useSettings = create<SettingsState & SettingsStateActions>()(
   persist(
@@ -20,13 +22,13 @@ const useSettings = create<SettingsState & SettingsStateActions>()(
       credential: "",
       highlightInput: false,
       theme: "dark",
-      quickSearch: true,
+      searchMode: "medium-search",
       updateState(data) {
         setter((prevState) => ({ ...prevState, ...data }));
       },
     }),
     {
-      name: SETTINGS_STORE_NAME,
+      name: STORE_KEY,
       storage: {
         removeItem(name) {
           chrome.storage.sync.remove(name);
@@ -42,10 +44,9 @@ const useSettings = create<SettingsState & SettingsStateActions>()(
         },
         setItem(name, { state }: StorageValue<SettingsState>) {
           const data: SettingsState = {
-            credential: state.credential,
             highlightInput: state.highlightInput,
             theme: state.theme,
-            quickSearch: state.quickSearch,
+            searchMode: state.searchMode,
           };
 
           chrome.storage.sync.set({
@@ -56,5 +57,12 @@ const useSettings = create<SettingsState & SettingsStateActions>()(
     }
   )
 );
+
+export const settingHelpers = {
+  async getStore() {
+    const store = (await chrome.storage.sync.get(STORE_KEY))?.[STORE_KEY];
+    return store as SettingsState;
+  },
+};
 
 export default useSettings;

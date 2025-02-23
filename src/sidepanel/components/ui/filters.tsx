@@ -2,7 +2,7 @@ import DatePickerWithRange from "./date-picker";
 import { cn, toDate } from "@/utils";
 import { Label } from "./label";
 import { SlidersHorizontal } from "lucide-react";
-import { FilterOption } from "@/models";
+import { CustomObject, FilterOption } from "@/models";
 import {
   Accordion,
   AccordionContent,
@@ -10,21 +10,21 @@ import {
   AccordionTrigger,
 } from "./accordion";
 
-interface Props {
+interface Props<T extends CustomObject<string>> {
   searchParams: URLSearchParams;
   onChange: (value: URLSearchParams) => void;
   className?: string;
   title: string;
-  filters: Readonly<FilterOption[]>;
+  filters: Readonly<FilterOption<T>[]>;
 }
 
-const Filters = ({
+const Filters = <T extends CustomObject<string>>({
   filters,
   title,
   className,
   onChange,
   searchParams,
-}: Props) => {
+}: Props<T>) => {
   return (
     <div className={cn(className)}>
       <Accordion type="single" collapsible className="mt-0">
@@ -38,14 +38,15 @@ const Filters = ({
           <AccordionContent>
             <form className="bg-accent px-4 py-3 rounded-md flex justify-between flex-wrap gap-3">
               {filters.map((filter) => {
+                const filterName = filter.name as string;
+
                 if (filter.type === "date-range") {
-                  const filterName = filter.name;
-                  const secondaryFilterName = filter.secondaryName!;
+                  const secondaryFilterName = filter.secondaryName as string;
                   const from = toDate(searchParams.get(filterName));
                   const to = toDate(searchParams.get(secondaryFilterName));
 
                   return (
-                    <Label key={filter.name} className="space-y-2 flex-1">
+                    <Label key={filterName} className="space-y-2 flex-1">
                       <div>{filter?.label}</div>
                       <DatePickerWithRange
                         restrictDaysAfterToday

@@ -24,7 +24,9 @@ const Home = () => {
   });
 
   const fetchRecentlyVisitedLinks = useCallback(async () => {
-    const response = await getRecentlyVisited({ query: "", maxResults: 3 });
+    const searchParams = new URLSearchParams();
+    searchParams.set("pageSize", "3");
+    const response = await getRecentlyVisited(searchParams);
     setRecentlyVisitedLinks(response);
   }, [getRecentlyVisited]);
 
@@ -37,7 +39,7 @@ const Home = () => {
       <header>
         <CustomSearch
           placeholder="Search for Bookmarks..."
-          handleSubmit={({ query }) => {
+          onChange={({ query }) => {
             if (query) {
               const searchParams = new URLSearchParams();
               searchParams.set("query", query);

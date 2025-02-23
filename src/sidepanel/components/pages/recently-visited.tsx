@@ -4,46 +4,41 @@ import EmptyState from "../ui/empty-state";
 import useRecentlyVisited from "@/sidepanel/hooks/useRecentlyVisited";
 import useTypedSearchParams from "@/sidepanel/hooks/useTypedSearchParams";
 import Loading from "../ui/loading";
+import CustomAlert from "../ui/custom-alert";
+import CustomSearch from "../ui/custom-search";
 import { bookmarkHelpers } from "@/sidepanel/store/useBookmark";
 import { titleCase } from "title-case";
 import { EllipsisVertical } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
-import { copyToClipboard, navigateWindowTo, toDate } from "@/utils";
+import { copyToClipboard, navigateWindowTo } from "@/utils";
 import { useCallback, useEffect, useState } from "react";
 import { RECENT_VISITED_LINKS_FILTERS } from "@/constants";
 import {
+  RecentLinksVisitedURLSearchParam,
   RecentlyVisitedLink,
-  RecentlyVisitedLinkPageSearchParams,
 } from "@/models";
-import CustomSearch from "../ui/custom-search";
 
 const RecentlyVisitedLinks = () => {
   const [isLoading, setisLoading] = useState(true);
-  const { getRecentlyVisited, removeRecentlyVisited } = useRecentlyVisited();
-  const { params, searchParams, setSearchParams } =
-    useTypedSearchParams<RecentlyVisitedLinkPageSearchParams>();
-  const [recentlyVisitedLinks, setRecentlyVisitedLinks] = useState<
-    RecentlyVisitedLink[] | null
-  >(null);
+  const [recentlyVisitedLinks, setRecentlyVisitedLinks] =
+    useState<RecentlyVisitedLink[]>();
+  const { getRecentlyVisited, removeRecentlyVisited, data, viewedDisclaimer } =
+    useRecentlyVisited();
+  const { searchParams, setSearchParams } =
+    useTypedSearchParams<RecentLinksVisitedURLSearchParam>();
+  const searchTerm = searchParams?.get("query");
 
   const fetchRecentlyVisitedLinks = useCallback(async () => {
     setisLoading(true);
-    const response = await getRecentlyVisited({
-      query: params?.query,
-      maxResults: 100,
-      range: {
-        from: toDate(params?.visitStartAt),
-        to: toDate(params?.visitEndAt),
-      },
-    });
+    const response = await getRecentlyVisited(searchParams);
     setRecentlyVisitedLinks(response);
     setisLoading(false);
-  }, [
-    getRecentlyVisited,
-    params?.query,
-    params?.visitEndAt,
-    params?.visitStartAt,
-  ]);
+  }, [getRecentlyVisited, searchParams]);
+
+  const handleSearch = (query: string) => {
+    searchParams.set("query", query);
+    setSearchParams(searchParams);
+  };
 
   useEffect(() => {
     fetchRecentlyVisitedLinks();
@@ -51,19 +46,27 @@ const RecentlyVisitedLinks = () => {
 
   return (
     <section className="py-6 flex flex-col flex-1 h-full">
+      <CustomAlert
+        isOpen={!data.isDisclaimerDisplayed}
+        onClose={viewedDisclaimer}
+        data={{
+          type: "warning",
+          title: "Disclaimer",
+          description: (
+            <>
+              Searching with full sentences isn't supported on this page yet
+              <br />
+              Please use the link name to find what you need.
+            </>
+          ),
+        }}
+      />
+
       <div>
         <CustomSearch
           placeholder="Search for Recently Visited..."
-          handleSubmit={(values) => {
-            if (values.query) {
-              const newSearchParams = new URLSearchParams();
-              newSearchParams.set("query", values.query ?? "");
-              setSearchParams(newSearchParams);
-              return;
-            }
-
-            setSearchParams();
-          }}
+          onBlur={({ target }) => handleSearch(target.value)}
+          onChange={({ query = "" }) => handleSearch(query)}
         />
 
         <Filters
@@ -79,10 +82,10 @@ const RecentlyVisitedLinks = () => {
 
         <EmptyState
           visible={!isLoading && recentlyVisitedLinks?.length === 0}
-          title="No Recent links yet"
+          title={searchTerm ? "No Results" : "No Recent links yet"}
           description={
-            params?.query
-              ? `No results found for "${params.query}". Try adjusting your search query.`
+            searchTerm
+              ? `No results found for "${searchTerm}". Try adjusting your search query.`
               : "Start visiting sites to have them appear here"
           }
         />
@@ -120,7 +123,7 @@ const RecentlyVisitedLinks = () => {
                           label: <div>Remove</div>,
                           className: "text-destructive font-semibold",
                           async onClick() {
-                            await removeRecentlyVisited({ url });
+                            await removeRecentlyVisited(url ?? "");
                             fetchRecentlyVisitedLinks();
                           },
                         },

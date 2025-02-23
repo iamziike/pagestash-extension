@@ -1,30 +1,44 @@
 import CustomInput, { CustomInputProps } from "./custom-input";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 interface SearchFormValues {
   query: string | undefined;
 }
 
-interface Props extends CustomInputProps {
-  handleSubmit(value: SearchFormValues): void;
+interface Props extends Omit<CustomInputProps, "onChange"> {
+  onChange(value: SearchFormValues): void;
   defaultValue?: string;
 }
 
-const CustomSearch = ({ handleSubmit, ...props }: Props) => {
-  const { handleSubmit: onSubmit, register } = useForm({
+const CustomSearch = ({ onChange, ...props }: Props) => {
+  const {
+    handleSubmit: onSubmit,
+    register,
+    reset,
+  } = useForm({
     defaultValues: { query: props?.defaultValue },
   });
+
+  const registerProps = register("query");
+
+  useEffect(() => {
+    reset({ query: props?.defaultValue });
+  }, [props?.defaultValue, reset]);
 
   return (
     <form
       className="flex items-center justify-between"
-      onSubmit={onSubmit(handleSubmit)}
+      onSubmit={onSubmit(onChange)}
     >
       <CustomInput
         autoComplete="off"
-        onClear={onSubmit(handleSubmit)}
         {...props}
-        {...register("query")}
+        {...registerProps}
+        onBlur={(event) => {
+          registerProps.onBlur(event);
+          props.onBlur?.(event);
+        }}
       />
     </form>
   );

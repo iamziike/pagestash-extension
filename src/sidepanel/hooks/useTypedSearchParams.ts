@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
+import { TypedURLSearchParam } from "@/models";
 import { useSearchParams } from "react-router-dom";
 
-const useTypedSearchParams = <T extends object>() => {
+const useTypedSearchParams = <T extends Record<string, string>>() => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [params, setParams] = useState<T>();
-
-  useEffect(() => {
-    setParams(Object.fromEntries(searchParams.entries()) as T);
-  }, [searchParams]);
 
   return {
     setSearchParams,
-    searchParams,
-    params,
+    searchParams: searchParams as TypedURLSearchParam<T>,
   };
 };
 
