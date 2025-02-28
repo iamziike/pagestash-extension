@@ -8,12 +8,18 @@ import { SetURLSearchParams } from "react-router-dom";
 import {
   BookmarkNode,
   BookmarkURLSearchParam,
+  PromptError,
   TypedURLSearchParam,
 } from "@/models";
+import CustomAlert from "../../custom-alert";
 
 interface Props {
   data: BookmarkNode | BookmarkNode[] | null;
   isLoading: boolean;
+  error?: {
+    data?: PromptError | null;
+    onClear: VoidFunction;
+  };
   filters: TypedURLSearchParam<BookmarkURLSearchParam>;
   onFiltersChange: SetURLSearchParams;
 }
@@ -23,6 +29,7 @@ const BookmarksList = ({
   isLoading,
   filters,
   onFiltersChange,
+  error,
 }: Props) => {
   const renderView = () => {
     const searchTerm = filters.get("query");
@@ -80,31 +87,6 @@ const BookmarksList = ({
           }
         />
       );
-    // }
-
-    // if (data instanceof Array) {
-    //   return (
-    //     <CollapsibleBookmark
-    //       isRoot
-    //       isDefaultOpen
-    //       data={{
-    //         id: "0",
-    //         title: "Results",
-    //         children: data,
-    //       }}
-    //     />
-    //   );
-    // }
-
-    // if (data?.parentId) {
-    //   return <CollapsibleBookmark data={data} isDefaultOpen />;
-    // }
-
-    // if (data) {
-    //   return data?.children?.map?.((child) => (
-    //     <CollapsibleBookmark key={child?.id} data={child} isDefaultOpen />
-    //   ));
-    // }
   };
 
   const handleSearch = (query: string) => {
@@ -114,6 +96,15 @@ const BookmarksList = ({
 
   return (
     <section className="py-6 flex flex-col flex-1 h-full">
+      <CustomAlert
+        isOpen={Boolean(error?.data)}
+        onClose={() => error?.onClear()}
+        data={{
+          type: "error",
+          title: error?.data?.title ?? "",
+          description: error?.data?.description,
+        }}
+      />
       <header>
         <CustomSearch
           defaultValue={filters.get("query") ?? ""}
