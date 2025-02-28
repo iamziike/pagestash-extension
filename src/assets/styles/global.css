@@ -122,3 +122,14 @@
 .hide-accordion-icon {
   @apply [&>*:last-child]:hidden;
 }
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -2,14 +2,16 @@ import React from "react";
 import CustomModal from "./custom-modal";
 import { AlertOctagon } from "lucide-react";
 
+export interface AlertData {
+  type: "warning" | "error";
+  title: string;
+  description?: string | React.ReactElement;
+}
+
 interface Props {
   isOpen: boolean;
   onClose: VoidFunction;
-  data: {
-    type: "warning";
-    title: string;
-    description?: string | React.ReactElement;
-  };
+  data: AlertData | null;
 }
 
 const CustomAlert = ({ isOpen, onClose, data }: Props) => {

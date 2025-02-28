@@ -1,14 +1,17 @@
+import { CredentialStore } from "@/sidepanel/store/useSettings";
+import { Bookmark, Home, Key, Settings } from "lucide-react";
 import {
   BookmarkURLSearchParam,
   FilterOption,
   RecentLinksVisitedURLSearchParam,
 } from "@/models";
-import { Bookmark, Home, Key, Settings } from "lucide-react";
 
 export const APP_NAME = "PageStash";
 
-export const OPENAI_CREATE_KEY_DOCS_URL =
-  "https://platform.openai.com/api-keys";
+export const DOCUMENTATION: { [K in CredentialStore["type"]]: string } = {
+  openai: "https://platform.openai.com/api-keys",
+  gemini: "https://aistudio.google.com/app/apikey",
+};
 
 export const STORE_KEY = {
   SIDEBAR_THEME: "SIDEBAR_THEME_STORAGE_KEY",

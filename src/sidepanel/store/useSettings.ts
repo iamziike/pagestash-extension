@@ -1,32 +1,58 @@
 import { create } from "zustand";
 import { persist, type StorageValue } from "zustand/middleware";
 
-interface SettingsState {
+export type CredentialStore = {
+  apiKey: string;
+  type: "gemini" | "openai";
+  isDefault?: boolean;
+};
+
+export interface SettingsState {
+  credential: {
+    apiKey: string;
+    type: "gemini" | "openai";
+    isDefault?: boolean;
+  } | null;
   highlightInput: boolean;
   theme: "dark" | "light" | "system";
-  searchMode:
-    | "quick-search" // Quick & less accurate
-    | "medium-search" // Medium speed, 80% accurate
-    | "slow-search"; // Slow but 100% accurate
 }
 
 interface SettingsStateActions {
+  reset(): void;
   updateState(data: Partial<SettingsState>): void;
+  getDefault(): SettingsState;
 }
 
 const STORE_KEY = "SETTINGS_STORE_NAME";
 
+export const DEFAULT_CREDENTIAL: SettingsState["credential"] = {
+  isDefault: true,
+  apiKey: import.meta.env.VITE_AI_API_KEY as string,
+  type: import.meta.env.VITE_AI_PROVIDER,
+};
+
 const useSettings = create<SettingsState & SettingsStateActions>()(
   persist(
-    (setter) => ({
-      credential: "",
-      highlightInput: false,
-      theme: "dark",
-      searchMode: "medium-search",
-      updateState(data) {
-        setter((prevState) => ({ ...prevState, ...data }));
-      },
-    }),
+    (setter) => {
+      const getDefault = () => {
+        return {
+          credential: DEFAULT_CREDENTIAL,
+          highlightInput: false,
+          theme: "dark",
+        } as const;
+      };
+
+      return {
+        ...getDefault(),
+        getDefault,
+        updateState(data) {
+          setter((prevState) => ({ ...prevState, ...data }));
+        },
+        reset() {
+          setter(() => getDefault());
+        },
+      };
+    },
     {
       name: STORE_KEY,
       storage: {
@@ -44,9 +70,12 @@ const useSettings = create<SettingsState & SettingsStateActions>()(
         },
         setItem(name, { state }: StorageValue<SettingsState>) {
           const data: SettingsState = {
+            credential: state.credential && {
+              ...state.credential,
+              isDefault: state.credential.apiKey === DEFAULT_CREDENTIAL.apiKey,
+            },
             highlightInput: state.highlightInput,
             theme: state.theme,
-            searchMode: state.searchMode,
           };
 
           chrome.storage.sync.set({
@@ -61,7 +90,10 @@ const useSettings = create<SettingsState & SettingsStateActions>()(
 export const settingHelpers = {
   async getStore() {
     const store = (await chrome.storage.sync.get(STORE_KEY))?.[STORE_KEY];
-    return store as SettingsState;
+    return {
+      ...store,
+      credential: store?.credential || DEFAULT_CREDENTIAL,
+    } as SettingsState;
   },
 };
 

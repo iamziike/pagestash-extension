@@ -7,6 +7,7 @@ import {
   BookmarkCreateArg,
   BookmarkURLSearchParam,
   TypedURLSearchParam,
+  PromptError,
 } from "@/models";
 
 interface BookmarksState {
@@ -24,8 +25,12 @@ interface BookmarksStateActions {
     id?: string;
     filter?: TypedURLSearchParam<BookmarkURLSearchParam>;
   }): Promise<
-    | { data: BookmarkNode[]; type: "links" }
-    | { data: BookmarkNode | null; type: "node" }
+    | {
+        data: BookmarkNode[] | null;
+        nodeType: "links";
+        error?: PromptError | null;
+      }
+    | { data: BookmarkNode | null; nodeType: "all"; error?: PromptError | null }
   >;
 }
 
@@ -90,7 +95,7 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
       );
 
       if (!hasFilter) {
-        return { data: node, type: "node" };
+        return { data: node, nodeType: "all" };
       }
 
       const dateRange = {
@@ -109,19 +114,31 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
 
       if (searchTermFilter) {
         const prompt = generateSearchTerm(searchTermFilter, links);
-        const response =
-          (await promptHelpers.makePrompt<string[]>(prompt, {
-            responseType: "array",
-          })) || [];
+        const { data, error, type } = await promptHelpers.makePrompt<string[]>(
+          prompt
+        );
 
-        links = [];
-        for (const link of response) {
-          const node = await getBookmark(link);
-          links.push(node!);
+        if (type === "error") {
+          return {
+            nodeType: "links",
+            data: null,
+            error,
+          };
         }
+
+        const searchedLinks: BookmarkNode[] = [];
+        for (const link of data || []) {
+          const node = await getBookmark(link);
+          searchedLinks.push(node!);
+        }
+
+        return {
+          data: searchedLinks,
+          nodeType: "links",
+        };
       }
 
-      return { data: links, type: "links" };
+      return { data: links, nodeType: "links" };
     };
 
     const addNewBookmark: BookmarksStateActions["addNewBookmark"] = async (

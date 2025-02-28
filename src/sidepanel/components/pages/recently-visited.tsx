@@ -81,7 +81,7 @@ const RecentlyVisitedLinks = () => {
         <Loading isLoading={isLoading} />
 
         <EmptyState
-          visible={!isLoading && recentlyVisitedLinks?.length === 0}
+          visible={recentlyVisitedLinks?.length === 0}
           title={searchTerm ? "No Results" : "No Recent links yet"}
           description={
             searchTerm

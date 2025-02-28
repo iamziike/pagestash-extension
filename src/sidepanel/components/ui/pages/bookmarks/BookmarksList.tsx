@@ -25,7 +25,7 @@ const BookmarksList = ({
   onFiltersChange,
 }: Props) => {
   const renderView = () => {
-    if ((!data || (data instanceof Array && !data?.length)) && !isLoading) {
+    if (!data || (data instanceof Array && !data?.length)) {
       const dateFilters = filters.get("createdStartDate");
       const searchTerm = filters.get("query");
 

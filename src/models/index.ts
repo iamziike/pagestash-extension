@@ -87,9 +87,16 @@ export type FavouriteBookmark = {
 };
 
 // PROMPT KEY
-export type PromptStore = {
-  provider: "google" | "openai";
-  apiKey: string;
+
+export type ERROR_TYPE = {
+  RESOURCE_EXHAUSTED: "RESOURCE_EXHAUSTED";
+  API_KEY_INVALID: "API_KEY_INVALID";
+};
+
+export type PromptError = {
+  type: ERROR_TYPE[keyof ERROR_TYPE];
+  title: string;
+  description: string;
 };
 
 export type GoogleErrorDetails = {

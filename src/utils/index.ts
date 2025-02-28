@@ -66,29 +66,6 @@ export const calculatePercentage = (part: number, total: number) => {
   return (part / total) * 100;
 };
 
-export const sendMessage = (id: string, data: Record<string, unknown>) => {
-  chrome.runtime.sendMessage({ id, data }, () => {
-    if (chrome.runtime.lastError) {
-      console.log("No Receiver for message!!");
-      return;
-    }
-  });
-};
-
-export const listenToMessage = <T>(id: string, callback: (data: T) => void) => {
-  const listener = (value: { id: string; data: T }) => {
-    if (value?.id === id) {
-      callback(value.data);
-    }
-  };
-
-  chrome.runtime.onMessage.addListener(listener);
-
-  return () => {
-    chrome.runtime.onMessage.removeListener(listener);
-  };
-};
-
 export const isWithinDateRange = (
   date: Date,
   range: { from?: string | null; end?: string | null }

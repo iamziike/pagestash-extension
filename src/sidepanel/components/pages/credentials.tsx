@@ -1,34 +1,41 @@
 import CustomModal from "../ui/custom-modal";
-import useSettings from "@/sidepanel/store/useSettings";
+import useSettings, { CredentialStore } from "@/sidepanel/store/useSettings";
 import ErrorText from "../ui/error-text";
-import { zodResolver } from "@hookform/resolvers/zod";
+import CustomSelect from "../ui/custom-select";
 import { z } from "zod";
 import { Input } from "../ui/input";
-import { useForm } from "react-hook-form";
-import { AlertOctagon } from "lucide-react";
-import { Button } from "../ui/button";
-import { cn, navigateWindowTo } from "@/utils";
-import { OPENAI_CREATE_KEY_DOCS_URL } from "@/constants";
-import { DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { useState } from "react";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertOctagon } from "lucide-react";
+import { Form, FormField } from "../ui/form";
+import { cn, navigateWindowTo } from "@/utils";
+import { DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { titleCase } from "title-case";
+import { DOCUMENTATION } from "@/constants";
 
 const CredentialFormSchema = z.object({
-  credential: z.string().min(5, "Credential must be more than 5 characters"),
+  key: z.string().min(5, "Credential must be more than 5 characters"),
+  provider: z.string(),
 });
 
+const providerOptions: { label: string; value: CredentialStore["type"] }[] = [
+  { label: "Gemini", value: "gemini" },
+];
+
 const Credentials = () => {
-  const settings = useSettings();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { handleSubmit, register, formState, clearErrors } = useForm<
-    z.infer<typeof CredentialFormSchema>
-  >({
+  const settings = useSettings();
+  const { credential } = settings;
+  const form = useForm<z.infer<typeof CredentialFormSchema>>({
     resolver: zodResolver(CredentialFormSchema),
   });
 
   const renderAddCredentialForm = () => {
     const handleFormClose = () => {
-      clearErrors();
+      form.clearErrors();
       setIsFormVisible(false);
     };
 
@@ -42,42 +49,77 @@ const Credentials = () => {
         onOpenChange={setIsFormVisible}
         trigger={
           <Button onClick={handleFormOpen}>
-            {settings.credential ? "Update your API Key" : "Add your API Key"}
+            {credential?.isDefault ? "Add your API Key" : "Update your API Key"}
           </Button>
         }
       >
-        <form
-          className="space-y-3"
-          onSubmit={handleSubmit(({ credential }) => {
-            settings.updateState({
-              credential,
-            });
-            handleFormClose();
-            toast("API Key has been added successfully.");
-          })}
-        >
-          <DialogHeader>
-            <DialogTitle className="mb-3">Add Credentials</DialogTitle>
-          </DialogHeader>
-          <div>
-            <Input
-              {...register("credential")}
-              className={cn({ "error-field": formState.errors.credential })}
-              placeholder="API Key"
+        <Form {...form}>
+          <form
+            className="space-y-3"
+            onSubmit={form.handleSubmit(({ key, provider }) => {
+              settings.updateState({
+                credential: {
+                  apiKey: key,
+                  type: provider as CredentialStore["type"],
+                },
+              });
+              handleFormClose();
+              toast("API Key has been added successfully.");
+            })}
+          >
+            <DialogHeader>
+              <DialogTitle className="mb-3">
+                {credential?.isDefault
+                  ? "Add Credentials"
+                  : "Update Credentials"}
+              </DialogTitle>
+            </DialogHeader>
+            <div>
+              <Input
+                {...form.register("key")}
+                className={cn({ "error-field": form.formState.errors.key })}
+                placeholder="API Key"
+              />
+              <ErrorText
+                className="text-center mt-1"
+                label={form.formState.errors.key?.message}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="provider"
+              render={({ field }) => {
+                return (
+                  <div>
+                    <CustomSelect
+                      placeholder="Provider"
+                      onValueChange={field.onChange}
+                      options={providerOptions}
+                    />
+                    <ErrorText
+                      className="text-center mt-1"
+                      label={form.formState.errors.provider?.message}
+                    />
+                  </div>
+                );
+              }}
             />
-            <ErrorText
-              className="text-center mt-1"
-              label={formState.errors.credential?.message}
-            />
-          </div>
-          <DialogFooter>
-            <Button className="uppercase" type="submit">
-              Save changes
-            </Button>
-          </DialogFooter>
-        </form>
+
+            <DialogFooter>
+              <Button className="uppercase" type="submit">
+                Save changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </CustomModal>
     );
+  };
+
+  const handleReset = () => {
+    const defaultCredentials = settings.getDefault().credential;
+    settings.updateState({ credential: defaultCredentials });
+    toast("Credentials has been reset to default");
   };
 
   return (
@@ -85,28 +127,41 @@ const Credentials = () => {
       <AlertOctagon size={120} className="mx-auto" />
       <h1 className="font-extrabold text-2xl">Important Notice</h1>
       <div className="font-light">
-        {settings.credential ? (
+        {credential?.isDefault ? (
           <>
-            An OpenAI API key is already set up in this app. <br />
-            You can update it if needed.
+            The {titleCase(credential?.type)} API Key in this app is shared
+            among multiple users.
+            <br />
+            For quicker response times and enhanced security, we recommend using
+            your own.
           </>
         ) : (
           <>
-            The OpenAI API key in this app is shared among multiple users.
-            <br />
-            For better performance, quicker response times, and enhanced
-            security, we recommend using your own API key.
+            An {titleCase(credential?.type ?? "")} API Key is already set up in
+            this app. <br />
+            You can update it if needed.
           </>
         )}
       </div>
       <div>
-        {renderAddCredentialForm()}
-        <div
-          className="block text-under mt-4 underline text-secondary-foreground text-sm font-light underline-offset-[6px] cursor-pointer"
-          onClick={() => navigateWindowTo(OPENAI_CREATE_KEY_DOCS_URL)}
-        >
-          Get an API Key
+        <div className="grid justify-center gap-5 flex-col">
+          {renderAddCredentialForm()}
+
+          {!credential?.isDefault && (
+            <Button onClick={handleReset} className="px-4">
+              Remove Existing API Key
+            </Button>
+          )}
         </div>
+
+        {credential?.type && (
+          <div
+            className="block text-under mt-4 underline text-secondary-foreground text-sm font-light underline-offset-[6px] cursor-pointer"
+            onClick={() => navigateWindowTo(DOCUMENTATION[credential.type])}
+          >
+            Get an API Key
+          </div>
+        )}
       </div>
       <div className="fixed left-0 w-full bottom-5 font-light text-[10px]">
         Your data privacy and security are important to us.
