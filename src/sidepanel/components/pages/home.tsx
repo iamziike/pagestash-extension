@@ -42,7 +42,7 @@ const Home = () => {
           onChange={({ query }) => {
             if (query) {
               const searchParams = new URLSearchParams();
-              searchParams.set("query", query);
+              searchParams.set("query", query?.trim());
               navigate(`${PAGES.BOOKMARKS.path}?${searchParams.toString()}`);
             }
           }}

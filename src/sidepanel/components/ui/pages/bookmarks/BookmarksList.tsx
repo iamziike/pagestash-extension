@@ -25,32 +25,12 @@ const BookmarksList = ({
   onFiltersChange,
 }: Props) => {
   const renderView = () => {
-    if (!data || (data instanceof Array && !data?.length)) {
-      const dateFilters = filters.get("createdStartDate");
-      const searchTerm = filters.get("query");
+    const searchTerm = filters.get("query");
+    const hasFilters = Array.from(filters.values()).length;
 
-      const hasFilters = dateFilters || searchTerm;
-      return (
-        <EmptyState
-          title={hasFilters ? "No Results" : "No Bookmarks yet"}
-          description={
-            hasFilters ? (
-              <>
-                No results found for {searchTerm || "filter"}. Try adjusting
-                your it.
-              </>
-            ) : (
-              "Start adding your bookmarks here for quick access"
-            )
-          }
-        />
-      );
-    }
-
-    if (data instanceof Array) {
+    if (data instanceof Array && data?.length) {
       return (
         <CollapsibleBookmark
-          isRoot
           isDefaultOpen
           data={{
             id: "0",
@@ -61,15 +41,70 @@ const BookmarksList = ({
       );
     }
 
-    if (data?.parentId) {
+    if (data && "id" in data) {
       return <CollapsibleBookmark data={data} isDefaultOpen />;
     }
 
-    if (data) {
-      return data?.children?.map?.((child) => (
-        <CollapsibleBookmark key={child?.id} data={child} isDefaultOpen />
-      ));
+    if (!isLoading) {
+      return (
+        <EmptyState
+          title={hasFilters ? "No Results" : "No Bookmarks yet"}
+          description={
+            hasFilters ? (
+              <>
+                No results found for{" "}
+                {searchTerm ? <>"{searchTerm}"</> : "filter applied"}. Try
+                adjusting your {searchTerm ? "search query" : "filter"}.
+              </>
+            ) : (
+              "Start adding your bookmarks here for quick access"
+            )
+          }
+        />
+      );
     }
+
+    if (!isLoading)
+      return (
+        <EmptyState
+          title={hasFilters ? "No Results" : "No Bookmarks yet"}
+          description={
+            hasFilters ? (
+              <>
+                No results found for {searchTerm || "filter"}. Try adjusting
+                your search query.
+              </>
+            ) : (
+              "Start adding your bookmarks here for quick access"
+            )
+          }
+        />
+      );
+    // }
+
+    // if (data instanceof Array) {
+    //   return (
+    //     <CollapsibleBookmark
+    //       isRoot
+    //       isDefaultOpen
+    //       data={{
+    //         id: "0",
+    //         title: "Results",
+    //         children: data,
+    //       }}
+    //     />
+    //   );
+    // }
+
+    // if (data?.parentId) {
+    //   return <CollapsibleBookmark data={data} isDefaultOpen />;
+    // }
+
+    // if (data) {
+    //   return data?.children?.map?.((child) => (
+    //     <CollapsibleBookmark key={child?.id} data={child} isDefaultOpen />
+    //   ));
+    // }
   };
 
   const handleSearch = (query: string) => {

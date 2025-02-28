@@ -22,11 +22,9 @@ interface Props {
   isRoot?: boolean;
 }
 
-const CollapsibleBookmark = ({
-  data,
-  isDefaultOpen = false,
-  isRoot = false,
-}: Props) => {
+const CollapsibleBookmark = ({ data, isDefaultOpen = false }: Props) => {
+  const isRoot = !data?.parentId;
+  const isRootChildren = data?.parentId === "0";
   const favourite = useFavourite();
   const { moveBookmark, removeBookmark } = useBookmark();
   const [formAction, setFormAction] = useState<BookmarkFormState | null>(null);
@@ -36,6 +34,9 @@ const CollapsibleBookmark = ({
   const [, drop] = useDrop(
     () => ({
       accept: [DRAGGABLE_ITEMS.LINK, DRAGGABLE_ITEMS.FOLDER],
+      canDrop() {
+        return !isRoot;
+      },
       drop: (draggedItem: DraggedItem, monitor) => {
         const isTarget = !monitor.didDrop();
         if (isTarget && draggedItem?.parentId !== data?.id) {
@@ -126,8 +127,7 @@ const CollapsibleBookmark = ({
             ) : (
               <Folder size={18} />
             )}
-
-            {titleCase(data.title || "Unamed Folder")}
+            {isRoot ? "Bookmarks" : titleCase(data.title || "Unamed Folder")}
           </div>
 
           {!isRoot && (
@@ -148,6 +148,7 @@ const CollapsibleBookmark = ({
                         },
                       },
                       {
+                        hidden: isRootChildren,
                         label: <div>Update</div>,
                         async onClick() {
                           setIsFolderContentVisible(true);
@@ -171,6 +172,7 @@ const CollapsibleBookmark = ({
                         },
                       },
                       {
+                        hidden: isRootChildren,
                         label: <div>Remove</div>,
                         variant: "danger",
                         async onClick() {

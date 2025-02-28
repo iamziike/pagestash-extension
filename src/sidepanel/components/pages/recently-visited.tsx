@@ -36,7 +36,7 @@ const RecentlyVisitedLinks = () => {
   }, [getRecentlyVisited, searchParams]);
 
   const handleSearch = (query: string) => {
-    searchParams.set("query", query);
+    searchParams.set("query", query?.trim());
     setSearchParams(searchParams);
   };
 

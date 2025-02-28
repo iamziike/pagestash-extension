@@ -77,7 +77,10 @@ const Filters = <T extends CustomObject<string>>({
 
                 if (filter.type === "number") {
                   const handleSubmit = (value: string) => {
-                    searchParams.set(filterName, value?.trim()?.split(".")[0]);
+                    searchParams.set(
+                      filterName,
+                      value?.trim()?.split(".")?.[0]?.trim()
+                    );
                     onChange(searchParams);
                   };
 
