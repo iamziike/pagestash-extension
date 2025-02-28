@@ -4,7 +4,6 @@ import { z } from "zod";
 import { Label } from "../../label";
 import { Button } from "../../button";
 import { useForm } from "react-hook-form";
-import { Textarea } from "../../textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BookmarkFormState } from "@/models";
 import { cn, getCurrentTab } from "@/utils";
@@ -16,8 +15,6 @@ type Props = Partial<BookmarkFormState> & {
 const BookmarkFormSchema = z.object({
   title: z.string().min(2),
   url: z.string().url("URL incorrect"),
-  desc: z.string().optional(),
-  keywords: z.array(z.string()).optional(),
 });
 
 const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
@@ -99,13 +96,6 @@ const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
                 "border border-destructive": formState.errors.url,
               })}
             />
-          </Label>
-        </div>
-
-        <div className="">
-          <Label className="space-y-2">
-            <span>Description</span>
-            <Textarea {...register("desc")} placeholder="Description" />
           </Label>
         </div>
       </div>

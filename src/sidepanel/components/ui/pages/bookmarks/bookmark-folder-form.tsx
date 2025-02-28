@@ -5,7 +5,6 @@ import { Label } from "../../label";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../button";
-import { Textarea } from "../../textarea";
 import { BookmarkFormState } from "@/models";
 
 type Props = Partial<BookmarkFormState> & {
@@ -68,18 +67,12 @@ const BookmarkFolderForm = ({ onComplete, ...props }: Props) => {
       <div className="space-y-5">
         <div className="">
           <Label className="space-y-2">
-            <span>Folder Name</span>
+            <span>Title</span>
             <CustomInput
               {...register("title")}
               placeholder="Title"
-              isIconHidden
+              iconClassName="hidden"
             />
-          </Label>
-        </div>
-        <div className="">
-          <Label className="space-y-2">
-            <span>Description</span>
-            <Textarea {...register("desc")} placeholder="Description" />
           </Label>
         </div>
       </div>
