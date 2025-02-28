@@ -2,7 +2,6 @@ import "@/assets/styles/global.css";
 import DefaultLayout from "./components/layouts/index.tsx";
 import Home from "./components/pages/home.tsx";
 import Credentials from "./components/pages/credentials.tsx";
-import Settings from "./components/pages/settings.tsx";
 import RecentlyVisitedLinks from "./components/pages/recently-visited.tsx";
 import Bookmarks from "./components/pages/bookmarks/index.tsx";
 import BookmarkSubFolder from "./components/pages/bookmarks/[id].tsx";
@@ -37,15 +36,6 @@ export const router = createMemoryRouter(
       element: (
         <DefaultLayout>
           <BookmarkSubFolder />
-        </DefaultLayout>
-      ),
-    },
-    {
-      path: PAGES.SETTINGS.path,
-      errorElement: <div>Something went wrong</div>,
-      element: (
-        <DefaultLayout>
-          <Settings />
         </DefaultLayout>
       ),
     },

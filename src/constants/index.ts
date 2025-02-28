@@ -1,5 +1,5 @@
 import { CredentialStore } from "@/sidepanel/store/useSettings";
-import { Bookmark, Home, Key, Settings } from "lucide-react";
+import { Bookmark, Home, Key } from "lucide-react";
 import {
   BookmarkURLSearchParam,
   FilterOption,
@@ -22,11 +22,6 @@ export const PAGES = {
     path: "/",
     label: "Home",
     icon: Home,
-  },
-  SETTINGS: {
-    path: "/settings",
-    label: "Settings",
-    icon: Settings,
   },
   BOOKMARKS: {
     path: "/bookmarks",

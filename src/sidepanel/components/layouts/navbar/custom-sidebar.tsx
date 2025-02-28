@@ -16,7 +16,7 @@ import {
   useSidebar,
 } from "../../ui/sidebar";
 
-const LINKS = [PAGES.HOME, PAGES.BOOKMARKS, PAGES.SETTINGS, PAGES.CREDENTIALS];
+const LINKS = [PAGES.HOME, PAGES.BOOKMARKS, PAGES.CREDENTIALS];
 
 const CustomSidebar = () => {
   const { toggleSidebar } = useSidebar();
