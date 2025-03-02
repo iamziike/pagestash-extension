@@ -129,14 +129,17 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
           };
         }
 
-        const searchedLinks: BookmarkNode[] = [];
-        for (const link of data || []) {
-          const node = await getBookmark(link);
-          searchedLinks.push(node!);
-        }
+        const lowerCasedSearchFilter = searchTermFilter;
+
+        links = links.filter(
+          ({ id, title, url }) =>
+            title?.toLowerCase()?.includes(lowerCasedSearchFilter) ||
+            url?.includes(lowerCasedSearchFilter) ||
+            data?.includes(id)
+        );
 
         return {
-          data: searchedLinks,
+          data: links,
           nodeType: "links",
         };
       }
