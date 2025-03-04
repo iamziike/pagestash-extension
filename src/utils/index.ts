@@ -68,15 +68,16 @@ export const calculatePercentage = (part: number, total: number) => {
 
 export const isWithinDateRange = (
   date: Date,
-  range: { from?: string | null; end?: string | null }
+  range?: { from?: string | null; to?: string | null }
 ) => {
-  const { end, from } = range;
+  const from = range?.from;
+  const to = range?.to;
 
-  if (!from || !end) {
+  if (!(from && to)) {
     return null;
   }
 
-  return date >= new Date(from) && date <= new Date(end);
+  return date >= new Date(from) && date <= new Date(to);
 };
 
 export const isObjectValuesTruthy = (values: unknown[]) => {

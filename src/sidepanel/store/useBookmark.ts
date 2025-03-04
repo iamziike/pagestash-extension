@@ -10,6 +10,7 @@ import {
   PromptError,
   FolderLink,
 } from "@/models";
+import trim from "lodash/trim";
 
 interface BookmarksState {
   bookmark: BookmarkNode | null;
@@ -42,36 +43,50 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
       bookmark: BookmarkNode[]
     ) => {
       return `
-       Task:
-        Rules:
-        a) The search term is case-insensitive.
-        b) The search term should either be present on the title or URL of the bookmark or it should correlate with it.
-          a) "Correlation" should follow this approach:
-            a) A description should be generated for each bookmark using the URL, try and figure what exactly this url is about. 
-            If it is facebook, it will obviously be a social media site for chatting etc. And if i search for social media you will return a bookmark that matches facebook right.
-            b) The second form of correlation is also based on the dateAdded field on each bookmark object. Always use this ${new Date(
-              "Jan 01 1990"
-            )} as the start and this ${new Date().toISOString()} as the end date. Unless a date is specified. 
-            If the searchterm includes a date range eg) last week, last month, yesterday, last year till yesterday, today, on Monday. Change the start date to match the date. if no end date is specified then still keep the default date, change it only if an end date is specified on search term.
-            Once a date range is computed only return bookmarks that fall within that date range.
+      Task: Rules:
 
-            Nb// Sometimes a date range is not specified but a date is eg) all Mondays, all Thursdays, all Fridays, all Saturdays, all Sundays, all Tuesdays, all Wednesdays, or all bookmarks that were created on 7th. In this case, you should return all bookmarks that were created on that day.
-            
-        Remember this rules are not exhaustive, you can add more rules to make the search more accurate.
-        Just make sure you understand the search term entered and understand the bookmarks you have and return the most accurate bookmarks that match the search term.
+      Global Rule: Divide the search term into three categories:
 
-        Return a JSON array containing only the id values of the bookmarks that match the search criteria.
-        The response should contain only JSON with no extra text, explanations, or formatting.
+      (1) What the user is looking for
+      (2) What the user is NOT looking for
+      (3) The date range the user is targeting.
+      (4) Find "every" bookmark that matches the search term. (do not return only the first match or incomplete matches)
+      Search Logic:
 
-        Here is the search-term = ${searchTerm}
-        Here is the array of objects =  ${JSON.stringify(
-          bookmark?.map(({ id, title, children, dateAdded }) => ({
-            id,
-            title,
-            children,
-            dateAdded: new Date(dateAdded!)?.toISOString(),
-          }))
-        )}
+      The search is case-insensitive.
+      The search term must either match the title or URL of a bookmark, or it must be correlated with it.
+      Correlation Logic:
+      Generate a description for each bookmark based on its URL to understand its purpose.
+      For example, if the URL is from Facebook, classify it as a social media site. A search term like 'social media' should return Facebook-related bookmarks.
+      The second correlation is based on the dateAdded field.
+      Default start date: 'Jan 01, 1990'.
+      Default end date: the current date (${new Date().toISOString()}).
+      If the search term specifies a date range (e.g., 'last week', 'yesterday', 'on Monday'), adjust the start date accordingly.
+      If a specific day or date is mentioned (e.g., 'all Mondays', 'all 7ths'), return bookmarks created on that specific day.
+      Output Format:
+
+      Return only a JSON object in the following format:
+      {"ids": ["bookmark1", "bookmark2"], "dateRange": {"from": "YYYY-MM-DDTHH:MM:SSZ", "to": "YYYY-MM-DDTHH:MM:SSZ", "todayDate": "YYYY-MM-DDTHH:MM:SSZ"}}.
+      No additional text, explanations, or formatting should be included in the response.
+
+      Additional Rules:
+
+      The endDate should always be set to 23:59:59.
+      Always calculate today's date and use it to compare against the user's requested date range.
+
+ 
+      Here is the search-term = ${searchTerm}.
+      Here is the array of objects =  ${JSON.stringify(
+        bookmark?.map(({ id, title, children, url, dateAdded }) => ({
+          id,
+          title,
+          children,
+          url,
+          dateAdded: new Date(dateAdded!)?.toISOString(),
+        })),
+        null,
+        2
+      )}
         `;
     };
     const getBookmark: BookmarksStateActions["getBookmark"] = async (
@@ -105,9 +120,10 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
         from: filter?.get("createdStartDate"),
         end: filter?.get("createdEndDate"),
       };
+
       let links = bookmarkHelpers.getAllBookmarkLinks(node);
       const hasDateFilter = isObjectValuesTruthy(Object.values(dateRange));
-      const searchTermFilter = filter?.get("query");
+      const searchTermFilter = trim(filter?.get("query") ?? "");
 
       if (hasDateFilter) {
         links = links.filter((node) =>
@@ -117,9 +133,10 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
 
       if (searchTermFilter) {
         const prompt = generateSearchTerm(searchTermFilter, links);
-        const { data, error, type } = await promptHelpers.makePrompt<string[]>(
-          prompt
-        );
+        const { data, error, type } = await promptHelpers.makePrompt<{
+          ids: string[];
+          dateRange: { from: string; to: string; todayDate: string };
+        }>(prompt);
 
         if (type === "error") {
           return {
@@ -129,14 +146,19 @@ const useBookmark = create<BookmarksState & BookmarksStateActions>()(
           };
         }
 
-        const lowerCasedSearchFilter = searchTermFilter;
+        links = links.filter(({ id, title, url, dateAdded }) => {
+          const lowerCasedSearchFilter = searchTermFilter?.toLowerCase();
 
-        links = links.filter(
-          ({ id, title, url }) =>
+          if (!isWithinDateRange(new Date(dateAdded!), data?.dateRange)) {
+            return false;
+          }
+
+          return (
             title?.toLowerCase()?.includes(lowerCasedSearchFilter) ||
             url?.includes(lowerCasedSearchFilter) ||
-            data?.includes(id)
-        );
+            data?.ids?.includes(id)
+          );
+        });
 
         return {
           data: links,

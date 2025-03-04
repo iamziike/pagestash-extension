@@ -74,7 +74,14 @@ const promptHelpers = {
 
     const genAI = new GoogleGenerativeAI(credential?.apiKey ?? "");
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-8b",
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        temperature: 1,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 10192,
+        responseMimeType: "application/json",
+      },
     });
 
     const result = await model.generateContent(prompt);
