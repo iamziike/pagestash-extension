@@ -54,7 +54,7 @@ const BookmarkFolderForm = ({ onComplete, ...props }: Props) => {
     if (props.action === "create") {
       addNewBookmark({
         index: 0,
-        parentId: props.parentId,
+        parentId: props.parent?.id,
         title: values.title,
       });
     }
