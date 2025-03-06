@@ -122,7 +122,8 @@ const RecentlyVisitedLinks = () => {
                         {
                           label: <div>Remove</div>,
                           className: "text-destructive font-semibold",
-                          async onClick() {
+                          async onClick(event) {
+                            event?.stopPropagation();
                             await removeRecentlyVisited(url ?? "");
                             fetchRecentlyVisitedLinks();
                           },
