@@ -9,12 +9,18 @@ import useFavourite from "@/sidepanel/store/useFavourite";
 import { cn } from "@/utils";
 import { useDrag, useDrop } from "react-dnd";
 import { DRAGGABLE_ITEMS } from "@/constants";
-import { BanIcon, EllipsisVertical, Folder, FolderOpen } from "lucide-react";
 import { titleCase } from "title-case";
 import { useState } from "react";
 import { BookmarkFormState } from "@/models";
 import { toast } from "sonner";
 import { BookmarkNode, DraggedItem } from "@/models";
+import {
+  BanIcon,
+  EllipsisVertical,
+  Folder,
+  FolderClosed,
+  FolderOpen,
+} from "lucide-react";
 
 interface Props {
   data: BookmarkNode;
@@ -72,6 +78,18 @@ const CollapsibleBookmark = ({ data, isDefaultOpen = false }: Props) => {
     setIsFolderContentVisible((prev) => !prev);
   };
 
+  const getFolderIconRender = () => {
+    if (isFolderContentVisible) {
+      return <FolderOpen size={18} />;
+    }
+
+    if (data?.children?.length) {
+      return <FolderClosed size={18} />;
+    }
+
+    return <Folder size={18} />;
+  };
+
   return (
     <>
       <CustomModal
@@ -122,11 +140,7 @@ const CollapsibleBookmark = ({ data, isDefaultOpen = false }: Props) => {
               "opacity-70": isDragging,
             })}
           >
-            {isFolderContentVisible ? (
-              <FolderOpen size={18} />
-            ) : (
-              <Folder size={18} />
-            )}
+            {getFolderIconRender()}
             {isRoot ? "Bookmarks" : titleCase(data.title || "Unamed Folder")}
           </div>
 
