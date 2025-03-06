@@ -51,7 +51,10 @@ export type BookmarkFormState =
     }
   | {
       action: "create";
-      parentId: string;
+      parent: {
+        id: string;
+        title: string;
+      };
     };
 
 export type BookmarkURLSearchParam = URLDefaultSearchParam & {

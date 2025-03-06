@@ -7,8 +7,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BookmarkFormState } from "@/models";
 import { cn, getCurrentTab } from "@/utils";
+import { toast } from "sonner";
+import { titleCase } from "title-case";
 
 type Props = Partial<BookmarkFormState> & {
+  hasCustomCompleteMessage?: boolean;
   onComplete: VoidFunction;
 };
 
@@ -17,7 +20,11 @@ const BookmarkFormSchema = z.object({
   url: z.string().url("URL incorrect"),
 });
 
-const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
+const BookmarkLinkForm = ({
+  onComplete,
+  hasCustomCompleteMessage,
+  ...props
+}: Props) => {
   const { updateBookmark, addNewBookmark } = useBookmark();
   const {
     handleSubmit: onSubmit,
@@ -55,15 +62,22 @@ const BookmarkLinkForm = ({ onComplete, ...props }: Props) => {
         title: values.title,
         url: values.url,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      !hasCustomCompleteMessage && toast("Bookmark updated successfully");
     }
 
     if (props.action === "create") {
       await addNewBookmark({
         index: 0,
-        parentId: props.parentId,
+        parentId: props.parent?.id,
         title: values.title,
         url: values.url,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      !hasCustomCompleteMessage &&
+        toast(`Added to ${titleCase(props?.parent?.title ?? "")}`);
     }
 
     onComplete();

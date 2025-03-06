@@ -143,7 +143,7 @@ const CollapsibleBookmark = ({ data, isDefaultOpen = false }: Props) => {
                           setIsFolderContentVisible(true);
                           setFormAction({
                             action: "create",
-                            parentId: data.id ?? "",
+                            parent: data,
                           });
                         },
                       },

@@ -1,5 +1,11 @@
 import { cn } from "@/utils";
-import { Dialog, DialogContent, DialogTrigger } from "./dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTrigger,
+  DialogTitle,
+} from "./dialog";
 
 interface Props {
   trigger?: React.ReactElement;
@@ -25,6 +31,10 @@ const CustomModal = ({
           "max-w-full md:max-w-screen-md": size === "medium",
         })}
       >
+        <div className="hidden">
+          <DialogTitle />
+          <DialogDescription />
+        </div>
         <div className="mt-4">{children}</div>
       </DialogContent>
     </Dialog>

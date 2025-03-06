@@ -26,8 +26,11 @@ const Navbar = () => {
               content: (
                 <BookmarkLinkForm
                   action="create"
-                  parentId={bookmark?.children?.[0]?.id}
                   onComplete={() => setIsFormOpen(false)}
+                  parent={{
+                    id: bookmark?.children?.[0]?.id ?? "",
+                    title: bookmark?.children?.[0]?.title ?? "",
+                  }}
                 />
               ),
             },

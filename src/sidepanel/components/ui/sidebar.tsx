@@ -6,7 +6,12 @@ import { cn } from "@/utils/index";
 import { Button } from "@/sidepanel/components/ui/button";
 import { Input } from "@/sidepanel/components/ui/input";
 import { Separator } from "@/sidepanel/components/ui/separator";
-import { Sheet, SheetContent } from "@/sidepanel/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/sidepanel/components/ui/sheet";
 import { Skeleton } from "@/sidepanel/components/ui/skeleton";
 import {
   Tooltip,
@@ -182,6 +187,10 @@ const Sidebar = React.forwardRef<
           className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden focus-visible:outline-none"
           side={side}
         >
+          <div className="hidden">
+            <SheetTitle />
+            <SheetDescription />
+          </div>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
       </Sheet>
